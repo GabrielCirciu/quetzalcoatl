@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class PlayMenuManager : MonoBehaviour {
     public MainMenuManager mainMenuManager;
     public GameObject characterSelectionPanel, playModePanel;
-    public GameObject hostButton, joinButton, joinPanel, worldSelectionPanel;
+    public GameObject hostButton, joinButton, singlePlayerPanel, hostPanel, joinPanel;
 
     void OnEnable() {
         characterSelectionPanel.SetActive(true);
@@ -31,26 +31,37 @@ public class PlayMenuManager : MonoBehaviour {
     public void OnSinglePlayerButtonPressed() {
         hostButton.SetActive(false);
         joinButton.SetActive(false);
-        worldSelectionPanel.SetActive(true);
+        hostPanel.SetActive(false);
+        joinPanel.SetActive(false);
+        singlePlayerPanel.SetActive(true);
     }
 
     public void OnMultiplayerButtonPressed() {
         hostButton.SetActive(true);
         joinButton.SetActive(true);
-        OnHostButtonPressed();
+        singlePlayerPanel.SetActive(false);
+        OnHostPanelButtonPressed();
     }
 
-    public void OnHostButtonPressed() {
-        worldSelectionPanel.SetActive(true);
+    public void OnHostPanelButtonPressed() {
+        hostPanel.SetActive(true);
         joinPanel.SetActive(false);
     }
 
     public void OnJoinListButtonPressed() {
         joinPanel.SetActive(true);
-        worldSelectionPanel.SetActive(false);
+        hostPanel.SetActive(false);
     }
 
-    public void OnStartButtonPressed() {
+    public void OnStartSinglePlayerButtonPressed() {
         SceneManager.LoadScene("CharacterAnimations");
+    }
+
+    public void OnStartServerHostButtonPressed() {
+        // Nothing yet, start server here
+    }
+
+    public void OnJoinFriendButtonPressed() {
+        // Nothing yet, join server here
     }
 }

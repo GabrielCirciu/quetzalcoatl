@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MainMenuManager : MonoBehaviour {
-    public GameObject ChangelogPanel, ExtrasCanvas, CreditsCanvas, MainMenuCanvas, OptionsCanvas, PlayCanvas;
+    public GameObject ChangelogPanel, ExtrasCanvas, CreditsCanvas, MainMenuCanvas, OptionsCanvas, PlayCanvas, PlayerCanvas;
 
     public void OnPlayButtonPressed() {
         PlayCanvas.SetActive(!PlayCanvas.activeSelf);
         MainMenuCanvas.SetActive(!MainMenuCanvas.activeSelf);
         ChangelogPanel.SetActive(false);
         ExtrasCanvas.SetActive(!ExtrasCanvas.activeSelf);
+        PlayerCanvas.SetActive(!PlayerCanvas.activeSelf);
     }
 
     public void OnOptionsButtonPressed() {
@@ -17,6 +18,7 @@ public class MainMenuManager : MonoBehaviour {
         MainMenuCanvas.SetActive(!MainMenuCanvas.activeSelf);
         ChangelogPanel.SetActive(false);
         ExtrasCanvas.SetActive(!ExtrasCanvas.activeSelf);
+        PlayerCanvas.SetActive(!PlayerCanvas.activeSelf);
     }
 
     public void OnCreditsButtonPressed() {
@@ -24,6 +26,7 @@ public class MainMenuManager : MonoBehaviour {
         MainMenuCanvas.SetActive(!MainMenuCanvas.activeSelf);
         ChangelogPanel.SetActive(false);
         ExtrasCanvas.SetActive(!ExtrasCanvas.activeSelf);
+        PlayerCanvas.SetActive(!PlayerCanvas.activeSelf);
     }
 
     public void OnChangelogButtonPressed() {
@@ -31,7 +34,6 @@ public class MainMenuManager : MonoBehaviour {
     }
 
     public void OnExitButtonPressed() {
-
         // Set up Cleanup functions to not lose or corrupt any data
         Application.Quit();
     }

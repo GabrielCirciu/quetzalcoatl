@@ -24,6 +24,7 @@ public class SteamManager : MonoBehaviour {
     public bool activeSteamSocketConnection = false;
 
     DataManager dataManager;
+    public WorldManager worldManager;
     
     void Awake(){
         if ( Instance == null ){
@@ -61,9 +62,7 @@ public class SteamManager : MonoBehaviour {
         steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(PlayerSteamId);
         activeSteamSocketServer = true;
         activeSteamSocketConnection = true;
-        if (steamConnectionManager != null) {
-            Debug.Log("Server created and joined");
-        }
+        if (steamConnectionManager != null) Debug.Log("Server created and joined");
     }
 
     public void JoinSteamSocketServer() {
@@ -79,6 +78,7 @@ public class SteamManager : MonoBehaviour {
         try {
             steamConnectionManager.Close();
             steamSocketManager.Close();
+            Debug.Log("You left the server");
         }
         catch { Debug.Log("Error closing socket server / connection manager"); }
     }

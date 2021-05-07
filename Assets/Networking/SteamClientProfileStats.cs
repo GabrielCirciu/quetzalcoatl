@@ -7,13 +7,13 @@ using UnityEngine.UI;
 using TMPro;
 
 public class SteamClientProfileStats : MonoBehaviour {
-    TextMeshProUGUI displayName;
+    TMP_Text displayName;
     public GameObject displayNameObj;
     public RawImage displaySteamImage;
 
     void Start() {
         if (SteamClient.IsValid) {
-            displayName = displayNameObj.GetComponent<TextMeshProUGUI>();
+            displayName = displayNameObj.GetComponent<TMP_Text>();
             GetSteamImage();
         }
         else Application.Quit();

@@ -9,12 +9,14 @@ public class InGameMenuManager : MonoBehaviour {
     public ChatManager chatManager;
     CinemachineFreeLook cameraFreeLook;
 
-    public WorldManager worldManager;
+    WorldManager worldManager;
+    SteamManager steamManager;
 
     void Start() {
         cameraFreeLook = cinemachineCamera.GetComponent<CinemachineFreeLook>();
         inGameMenuPanel.SetActive(false);
         worldManager = GameObject.Find("WorldManager").GetComponent<WorldManager>();
+        steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
     }
 
     void Update() {
@@ -46,7 +48,7 @@ public class InGameMenuManager : MonoBehaviour {
     }
 
     public void OnMainMenuButtonPressed() {
-        worldManager.ReturnToMainMenu();
+        steamManager.LeaveSteamSocketServer();
     }
 
     public void OnExitButtonPressed() {

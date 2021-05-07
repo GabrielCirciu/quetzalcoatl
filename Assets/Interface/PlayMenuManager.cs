@@ -62,8 +62,4 @@ public class PlayMenuManager : MonoBehaviour {
     public void OnJoinFriendButtonPressed() {
         // Nothing yet, join server here
     }
-
-    public void OnRefreshFriendListButtonPressed() {
-        // Nothing yet, refresh friends list here
-    }
 }

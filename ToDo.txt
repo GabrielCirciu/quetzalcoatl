@@ -1,5 +1,14 @@
 To do:
 
+Fixing and slight improvements:
+	Fix infinite jump (probably ground check issue)
+	Implement disconnect message
+	Fix mouse lock on disconnect/ leave
+	Update friendlist periodically
+	Player-list in-game
+	Reduce camera clip ignore distance
+	Check if single player actually single player
+
 Network:
 	Look into data serialization to send over the network (json or other format)
 	(might be easier to handle multiple kinds of code data)

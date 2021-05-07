@@ -13,17 +13,6 @@ A private repo for managing the project files without the possibility of complet
 	Server only handles distribution of data
 	Client handles decoding data and acting according to data label
 
-# Port project over to a fresh build:
-	Move all currently used and useful scripts and objects to a new project
-	Clean up all the scripts to make them more modular, less singleton based
-
-# Set up all menu items:
-	Use the designed UI layout for the game
-	Implement every menu button, slider, dropdown
-	Set up every aspect to be functional
-	Implement in-game menu, with full functionality
-	Set up placeholders for unused menus
-
 # Set up Server Creation UI and savings:
 	When hosting server, Server Name should be given
 	Server should handle saving all data in a folder / files

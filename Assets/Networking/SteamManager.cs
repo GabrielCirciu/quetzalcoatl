@@ -62,14 +62,14 @@ public class SteamManager : MonoBehaviour {
         steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(PlayerSteamId);
         activeSteamSocketServer = true;
         activeSteamSocketConnection = true;
-        if (steamConnectionManager != null) Debug.Log("Server created and joined");
+        if (steamConnectionManager != null) Debug.Log("Attempting to create a server");
     }
 
     public void JoinSteamSocketServer() {
         steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(FriendSteamId, 0);
         activeSteamSocketServer = false;
         activeSteamSocketConnection = true;
-        if (steamConnectionManager != null) Debug.Log("Server joined");
+        if (steamConnectionManager != null) Debug.Log("Attempting to join a server");
     }
 
     public void LeaveSteamSocketServer() {
@@ -97,6 +97,7 @@ public class SteamManager : MonoBehaviour {
     }
 
     public bool SendMessageToSocketServer(byte[] messageToSend) {
+        Debug.Log("We sent a message to server");
         try { // Convert string/byte[] message into IntPtr data type for efficient message send / garbage management
             int sizeOfMessage = messageToSend.Length;
             IntPtr intPtrMessage = System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeOfMessage);

@@ -60,6 +60,6 @@ public class PlayMenuManager : MonoBehaviour {
     }
 
     public void OnJoinFriendButtonPressed() {
-        // Nothing yet, join server here
+        steamManager.JoinSteamSocketServer();
     }
 }

@@ -13,9 +13,17 @@ public class DataManager : MonoBehaviour {
     }
 
     public void ProcessRecievedData(byte[] dataArray) {
-        // Checks first byte if it's "n" which is 110 in UTF8-Hex encoding
-        if (dataArray[0] == 110) {
-            chatManager.RecieveChatMessage(dataArray);
+        // Checks first byte of the data array
+        Debug.Log("We have recieved a message and are processing it");
+        switch ( dataArray[0] ) {
+            // CHAT MESSAGE: "n" (110 in UTF8-Hex): Send chat message
+            case 110:
+                chatManager.RecieveChatMessage(dataArray);
+                break;
+            // PLAYER JOINED: "o" (111 in UTF8-Hex): Send player joined chat message
+            case 111:
+                chatManager.JoinedChatMessage(dataArray);
+                break;
         }
     }
 }

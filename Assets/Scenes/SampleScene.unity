@@ -4218,6 +4218,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd8df115a11c69e4e82cd56bef1f7abd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  steamManager: {fileID: 1553452437}
+  chatManager: {fileID: 0}
 --- !u!4 &272661426
 Transform:
   m_ObjectHideFlags: 0
@@ -7596,7 +7598,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: v0.210507.1
+  m_text: v0.210507.2
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 6a72a4f7b255b964a95ae7edcc03b447, type: 2}
   m_sharedMaterial: {fileID: -5869629922348858554, guid: 6a72a4f7b255b964a95ae7edcc03b447, type: 2}
@@ -19775,7 +19777,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: " - Moving some menu features around to allow for easier access through
     scripting\n - Re-implementation of Server hosting and joining with better friendslist\n
-    - Chat made server-sided on multiplayer (attempting separation later on)"
+    - Chat made server-sided on multiplayer (attempting separation later on)\n -
+    Added chat notification on player join"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 6a72a4f7b255b964a95ae7edcc03b447, type: 2}
   m_sharedMaterial: {fileID: -5869629922348858554, guid: 6a72a4f7b255b964a95ae7edcc03b447, type: 2}

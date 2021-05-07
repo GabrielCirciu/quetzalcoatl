@@ -102,4 +102,24 @@ public class ChatManager : MonoBehaviour {
                                     newMessage.name+"</color> <b>]</b>: "+newMessage.text;
         messageList.Add(newMessage);
     }
+
+    public void JoinedChatMessage(byte[] eMessage) {
+        Debug.Log("We should have recieved a message");
+        if ( messageList.Count >= maxMessages ) {
+            Destroy(messageList[0].textText.gameObject);
+            messageList.Remove(messageList[0]);
+        }
+        Message newMessage = new Message();
+        newMessage.overflow = int.Parse(System.Text.Encoding.UTF8.GetString(eMessage, 1, 1));
+        newMessage.namelength = int.Parse(System.Text.Encoding.UTF8.GetString(eMessage, 2, 1+newMessage.overflow));
+        newMessage.timestamp = System.Text.Encoding.UTF8.GetString(eMessage, 3+newMessage.overflow, 5);
+        newMessage.name = System.Text.Encoding.UTF8.GetString(eMessage, 8+newMessage.overflow, newMessage.namelength);
+        int textStartPos = 8 + newMessage.overflow + newMessage.namelength;
+        newMessage.text = System.Text.Encoding.UTF8.GetString(eMessage, textStartPos, eMessage.Length-textStartPos);
+        GameObject newTextObject = Instantiate(textObject, contentPanel.transform);
+        newMessage.textText = newTextObject.GetComponent<TMP_Text>();
+        newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <b><color=#FFFF00>"+
+                                    newMessage.name+"</color></b>: "+newMessage.text;
+        messageList.Add(newMessage);
+    }
 }

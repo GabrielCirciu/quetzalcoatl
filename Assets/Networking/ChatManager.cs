@@ -27,6 +27,20 @@ public class ChatManager : MonoBehaviour {
         cameraFreeLook = cinemachineCamera.GetComponent<CinemachineFreeLook>();
         maxMessages = 10;
         isChatWindowOpen = false;
+        SelfJoinMessage();
+    }
+
+    void SelfJoinMessage() {
+        string messageIdentifier = "o";
+        string messageTimeStamp = DateTime.Now.ToString("HH:mm");
+        string messageName = SteamClient.Name.ToString();
+        int messageNameLength = messageName.Length;
+        int messageNameOverflow = 0;
+        if (messageNameLength > 9) messageNameOverflow = 1;
+        string joinedText = " has joined the world!";
+        string encodedMessage = messageIdentifier+messageNameOverflow+messageNameLength.ToString()+messageTimeStamp+messageName+joinedText;
+        byte[] messageToByte = System.Text.Encoding.UTF8.GetBytes(encodedMessage);
+        JoinedChatMessage(messageToByte);
     }
 
     void Update(){
@@ -65,7 +79,7 @@ public class ChatManager : MonoBehaviour {
         chatInputFieldObject.SetActive(false);
         chatCanvas.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
-        cameraFreeLook.m_YAxis.m_MaxSpeed = 3f;
+        cameraFreeLook.m_YAxis.m_MaxSpeed = 0.01f;
         cameraFreeLook.m_XAxis.m_MaxSpeed = 1f;
         cinemachineCamera.GetComponent<CameraControls>().enabled = true;
         characterObj.GetComponent<CharacterLocomotion>().enabled = true;

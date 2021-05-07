@@ -37,7 +37,7 @@ public class InGameMenuManager : MonoBehaviour {
 
     public void OnResumeButtonPressed() {
         Cursor.lockState = CursorLockMode.Locked;
-        cameraFreeLook.m_YAxis.m_MaxSpeed = 3f;
+        cameraFreeLook.m_YAxis.m_MaxSpeed = 0.01f;
         cameraFreeLook.m_XAxis.m_MaxSpeed = 1f;
         inGameMenuPanel.SetActive(false);
         cinemachineCamera.GetComponent<CameraControls>().enabled = true;

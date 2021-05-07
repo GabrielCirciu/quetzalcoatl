@@ -14,7 +14,7 @@ public class DataManager : MonoBehaviour {
 
     public void ProcessRecievedData(byte[] dataArray) {
         // Checks first byte of the data array
-        Debug.Log("We have recieved a message and are processing it");
+        Debug.Log("Recieved a message and processing it");
         switch ( dataArray[0] ) {
             // CHAT MESSAGE: "n" (110 in UTF8-Hex): Send chat message
             case 110:

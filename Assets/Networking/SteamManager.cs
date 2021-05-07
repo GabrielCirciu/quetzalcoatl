@@ -78,7 +78,7 @@ public class SteamManager : MonoBehaviour {
         try {
             steamConnectionManager.Close();
             steamSocketManager.Close();
-            Debug.Log("You left the server");
+            Debug.Log("Left the server");
         }
         catch { Debug.Log("Error closing socket server / connection manager"); }
     }
@@ -97,7 +97,7 @@ public class SteamManager : MonoBehaviour {
     }
 
     public bool SendMessageToSocketServer(byte[] messageToSend) {
-        Debug.Log("We sent a message to server");
+        Debug.Log("Data sent to server");
         try { // Convert string/byte[] message into IntPtr data type for efficient message send / garbage management
             int sizeOfMessage = messageToSend.Length;
             IntPtr intPtrMessage = System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeOfMessage);

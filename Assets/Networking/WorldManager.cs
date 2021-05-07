@@ -9,7 +9,6 @@ public class WorldManager : MonoBehaviour {
     public static WorldManager Instance;
     public SteamManager steamManager;
     public GameObject chatManagerObj;
-    public ChatManager chatManager;
 
     void Awake(){
         if ( Instance == null ) {
@@ -39,13 +38,6 @@ public class WorldManager : MonoBehaviour {
         string encodedMessage = messageIdentifier+messageNameOverflow+messageNameLength.ToString()+messageTimeStamp+messageName+joinedText;
         byte[] messageToByte = System.Text.Encoding.UTF8.GetBytes(encodedMessage);
         steamManager.SendMessageToSocketServer(messageToByte);
-        Debug.Log("We start looking for the Chat Manager");
-        chatManagerObj = GameObject.Find("ChatManager");
-        Debug.Log("We found the Chat Manager Object");
-        chatManager = chatManagerObj.GetComponent<ChatManager>();
-        chatManager = chatManagerObj.GetComponentInChildren<ChatManager>();
-        Debug.Log("We found the Chat Manager Component");
-        chatManager.JoinedChatMessage(messageToByte);
     }
 
     public void ReturnToMainMenu() {

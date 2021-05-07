@@ -8,7 +8,7 @@ using TMPro;
 using Cinemachine;
 
 public class ChatManager : MonoBehaviour {
-    // public SteamManager steamManager;
+    public SteamManager steamManager;
     CinemachineFreeLook cameraFreeLook;
     public TMP_InputField chatInputField;
     public GameObject cinemachineCamera, chatCanvas, characterObj;
@@ -23,7 +23,7 @@ public class ChatManager : MonoBehaviour {
     }
 
     void Start(){
-        // steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
+        steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
         cameraFreeLook = cinemachineCamera.GetComponent<CinemachineFreeLook>();
         maxMessages = 10;
         isChatWindowOpen = false;
@@ -74,13 +74,13 @@ public class ChatManager : MonoBehaviour {
     public void SendChatMessage(string chatText) {
         string messageIdentifier = "n";
         string messageTimeStamp = DateTime.Now.ToString("HH:mm");
-        string messageName = "Zae"; // SteamClient.Name.ToString();
+        string messageName = SteamClient.Name.ToString();
         int messageNameLength = messageName.Length;
         int messageNameOverflow = 0;
         if (messageNameLength > 9) messageNameOverflow = 1;
         string encodedMessage = messageIdentifier+messageNameOverflow+messageNameLength.ToString()+messageTimeStamp+messageName+chatText;
         byte[] messageToByte = System.Text.Encoding.UTF8.GetBytes(encodedMessage);
-        // steamManager.SendMessageToSocketServer(messageToByte);
+        steamManager.SendMessageToSocketServer(messageToByte);
         RecieveChatMessage(messageToByte);
     }
 

@@ -8,7 +8,7 @@ public class DataManager : MonoBehaviour {
     public ChatManager chatManager;
 
     void Start() {
-        steamManager = GameObject.Find("SteamManagerGameObject").GetComponent<SteamManager>();
+        steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
         steamManager.ActivateDataManager();
     }
 

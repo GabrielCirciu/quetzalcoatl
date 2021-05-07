@@ -23,7 +23,7 @@ public class SteamManager : MonoBehaviour {
     public bool activeSteamSocketServer = false;
     public bool activeSteamSocketConnection = false;
 
-    DataManager dataManager;
+    public DataManager dataManager;
     public WorldManager worldManager;
     
     void Awake(){
@@ -123,7 +123,7 @@ public class SteamManager : MonoBehaviour {
         try {
             byte[] dataArray = new byte[dataBlockSize];
             System.Runtime.InteropServices.Marshal.Copy(messageIntPtr, dataArray, 0, dataBlockSize);
-            //dataManager.ProcessRecievedData(dataArray);
+            dataManager.ProcessRecievedData(dataArray);
         }
         catch { Debug.Log("Unable to process message from socket server"); }
     }

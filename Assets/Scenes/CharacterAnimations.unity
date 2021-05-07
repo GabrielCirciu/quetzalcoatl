@@ -558,6 +558,7 @@ GameObject:
   - component: {fileID: 136703036}
   - component: {fileID: 136703035}
   - component: {fileID: 136703034}
+  - component: {fileID: 136703037}
   m_Layer: 5
   m_Name: UI_ScrollView_ChatMessages
   m_TagString: Untagged
@@ -654,6 +655,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 136703032}
   m_CullTransparentMesh: 1
+--- !u!225 &136703037
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 136703032}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &176841729
 GameObject:
   m_ObjectHideFlags: 0
@@ -1750,11 +1763,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae2b1c08db016bd49bd85bf176719fa6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  steamManager: {fileID: 0}
   chatInputField: {fileID: 1023351251}
   cinemachineCamera: {fileID: 260459115}
   chatCanvas: {fileID: 1713448404}
   characterObj: {fileID: 919132147834344001}
+  scrollViewObj: {fileID: 136703032}
   contentPanel: {fileID: 1520751628}
   chatInputFieldObject: {fileID: 1023351249}
   textObject: {fileID: 8020221284334630622, guid: 4578432c6cd222445bc4c8ca8d0a0367, type: 3}

@@ -1,6 +1,7 @@
 using Steamworks;
 using System;
 using System.Text;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,8 +12,9 @@ public class ChatManager : MonoBehaviour {
     public SteamManager steamManager;
     CinemachineFreeLook cameraFreeLook;
     public TMP_InputField chatInputField;
-    public GameObject cinemachineCamera, chatCanvas, characterObj;
+    public GameObject cinemachineCamera, chatCanvas, characterObj, scrollViewObj;
     public GameObject contentPanel, chatInputFieldObject, textObject;
+    CanvasGroup canvasGroup;
     int maxMessages;
     public bool isChatWindowOpen;
     public List<Message> messageList = new List<Message>();
@@ -25,6 +27,7 @@ public class ChatManager : MonoBehaviour {
     void Start(){
         steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
         cameraFreeLook = cinemachineCamera.GetComponent<CinemachineFreeLook>();
+        canvasGroup = scrollViewObj.GetComponent<CanvasGroup>();
         maxMessages = 10;
         isChatWindowOpen = false;
         SelfJoinMessage();
@@ -45,7 +48,10 @@ public class ChatManager : MonoBehaviour {
 
     void Update(){
         if ( Input.GetKeyDown(KeyCode.Return) ) {
-            if ( !chatCanvas.activeSelf ) OpenChatWindow();
+            if ( !chatCanvas.activeSelf || !chatInputFieldObject.activeSelf ) {
+                StopAllCoroutines();
+                OpenChatWindow();
+            }
             else {
                 if ( chatInputField.text == "" ) {
                     CloseChatWindow();
@@ -60,10 +66,11 @@ public class ChatManager : MonoBehaviour {
                 }
             }
         }
-        if ( Input.GetKeyDown(KeyCode.Escape) && chatCanvas.activeSelf ) CloseChatWindow();
+        if ( Input.GetKeyDown(KeyCode.Escape) && chatCanvas.activeSelf && chatInputFieldObject.activeSelf ) CloseChatWindow();
     }
 
     void OpenChatWindow() {
+        canvasGroup.alpha = 1;
         chatCanvas.SetActive(true);
         chatInputFieldObject.SetActive(true);
         chatInputField.ActivateInputField();
@@ -103,6 +110,7 @@ public class ChatManager : MonoBehaviour {
             Destroy(messageList[0].textText.gameObject);
             messageList.Remove(messageList[0]);
         }
+
         Message newMessage = new Message();
         newMessage.overflow = int.Parse(System.Text.Encoding.UTF8.GetString(eMessage, 1, 1));
         newMessage.namelength = int.Parse(System.Text.Encoding.UTF8.GetString(eMessage, 2, 1+newMessage.overflow));
@@ -115,6 +123,26 @@ public class ChatManager : MonoBehaviour {
         newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <b>[</b> <color=#00FFFF>"+
                                     newMessage.name+"</color> <b>]</b>: "+newMessage.text;
         messageList.Add(newMessage);
+
+        if ( !chatCanvas.activeSelf ) StartCoroutine( ChatFadeOut() );
+    }
+
+    IEnumerator ChatFadeOut() {
+        chatCanvas.SetActive(true);
+        chatInputFieldObject.SetActive(false);
+        float initialTimer = 1f;
+        while (initialTimer > 0 ) {
+            initialTimer -= Time.deltaTime/5;
+            yield return null;
+        }
+        while ( canvasGroup.alpha > 0 ) {
+            canvasGroup.alpha -= Time.deltaTime;
+            yield return null;
+        }
+        chatInputFieldObject.SetActive(true);
+        chatCanvas.SetActive(false);
+        canvasGroup.alpha = 1;
+        yield return null;
     }
 
     public void JoinedChatMessage(byte[] eMessage) {
@@ -134,5 +162,7 @@ public class ChatManager : MonoBehaviour {
         newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <b><color=#FFFF00>"+
                                     newMessage.name+newMessage.text+"</color></b>";
         messageList.Add(newMessage);
+
+        if ( !chatCanvas.activeSelf ) StartCoroutine( ChatFadeOut() );
     }
 }

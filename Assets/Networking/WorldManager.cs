@@ -8,7 +8,7 @@ using System;
 public class WorldManager : MonoBehaviour {
     public static WorldManager Instance;
     public SteamManager steamManager;
-    public ChatManager chatManager;
+    public GameObject chatManagerObj;
 
     void Awake(){
         if ( Instance == null ) {
@@ -34,13 +34,15 @@ public class WorldManager : MonoBehaviour {
         int messageNameLength = messageName.Length;
         int messageNameOverflow = 0;
         if (messageNameLength > 9) messageNameOverflow = 1;
-        string joinedText = "has joined the world!";
+        string joinedText = " has joined the world!";
         string encodedMessage = messageIdentifier+messageNameOverflow+messageNameLength.ToString()+messageTimeStamp+messageName+joinedText;
         byte[] messageToByte = System.Text.Encoding.UTF8.GetBytes(encodedMessage);
         steamManager.SendMessageToSocketServer(messageToByte);
         Debug.Log("We start looking for the Chat Manager");
-        chatManager = GameObject.Find("ChatManager").GetComponent<ChatManager>();
-        Debug.Log("We found the chat Manager");
+        chatManagerObj = GameObject.Find("ChatManager");
+        Debug.Log("We found the Chat Manager Object");
+        ChatManager chatManager = chatManagerObj.GetComponent<ChatManager>();
+        Debug.Log("We found the Chat Manager Component");
         chatManager.JoinedChatMessage(messageToByte);
     }
 

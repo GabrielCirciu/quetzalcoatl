@@ -104,7 +104,6 @@ public class ChatManager : MonoBehaviour {
     }
 
     public void JoinedChatMessage(byte[] eMessage) {
-        Debug.Log("We should have recieved a message");
         if ( messageList.Count >= maxMessages ) {
             Destroy(messageList[0].textText.gameObject);
             messageList.Remove(messageList[0]);
@@ -119,7 +118,7 @@ public class ChatManager : MonoBehaviour {
         GameObject newTextObject = Instantiate(textObject, contentPanel.transform);
         newMessage.textText = newTextObject.GetComponent<TMP_Text>();
         newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <b><color=#FFFF00>"+
-                                    newMessage.name+"</color></b>: "+newMessage.text;
+                                    newMessage.name+newMessage.text+"</color></b>";
         messageList.Add(newMessage);
     }
 }

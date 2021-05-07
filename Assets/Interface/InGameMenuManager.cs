@@ -9,9 +9,12 @@ public class InGameMenuManager : MonoBehaviour {
     public ChatManager chatManager;
     CinemachineFreeLook cameraFreeLook;
 
+    public WorldManager worldManager;
+
     void Start() {
         cameraFreeLook = cinemachineCamera.GetComponent<CinemachineFreeLook>();
         inGameMenuPanel.SetActive(false);
+        worldManager = GameObject.Find("WorldManager").GetComponent<WorldManager>();
     }
 
     void Update() {
@@ -43,7 +46,7 @@ public class InGameMenuManager : MonoBehaviour {
     }
 
     public void OnMainMenuButtonPressed() {
-        SceneManager.LoadScene("SampleScene");
+        worldManager.ReturnToMainMenu();
     }
 
     public void OnExitButtonPressed() {

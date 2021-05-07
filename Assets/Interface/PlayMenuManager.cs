@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayMenuManager : MonoBehaviour {
     public MainMenuManager mainMenuManager;
     public GameObject characterSelectionPanel, playModePanel;
-    public GameObject hostButton, joinButton, singlePlayerPanel, hostPanel, joinPanel;
+    public GameObject singlePlayerPanel, multiPlayerPanel, hostPanel, joinPanel;
+
+    public SteamManager steamManager;
+    public WorldManager worldManager;
 
     void OnEnable() {
         characterSelectionPanel.SetActive(true);
@@ -29,17 +31,13 @@ public class PlayMenuManager : MonoBehaviour {
     }
 
     public void OnSinglePlayerButtonPressed() {
-        hostButton.SetActive(false);
-        joinButton.SetActive(false);
-        hostPanel.SetActive(false);
-        joinPanel.SetActive(false);
         singlePlayerPanel.SetActive(true);
+        multiPlayerPanel.SetActive(false);
     }
 
     public void OnMultiplayerButtonPressed() {
-        hostButton.SetActive(true);
-        joinButton.SetActive(true);
         singlePlayerPanel.SetActive(false);
+        multiPlayerPanel.SetActive(true);
         OnHostPanelButtonPressed();
     }
 
@@ -48,20 +46,24 @@ public class PlayMenuManager : MonoBehaviour {
         joinPanel.SetActive(false);
     }
 
-    public void OnJoinListButtonPressed() {
+    public void OnJoinPanelButtonPressed() {
         joinPanel.SetActive(true);
         hostPanel.SetActive(false);
     }
 
     public void OnStartSinglePlayerButtonPressed() {
-        SceneManager.LoadScene("CharacterAnimations");
+        worldManager.StartSinglePlayerWorld();
     }
 
     public void OnStartServerHostButtonPressed() {
-        // Nothing yet, start server here
+        steamManager.CreateSteamSocketServer();
     }
 
     public void OnJoinFriendButtonPressed() {
         // Nothing yet, join server here
+    }
+
+    public void OnRefreshFriendListButtonPressed() {
+        // Nothing yet, refresh friends list here
     }
 }

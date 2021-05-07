@@ -49,7 +49,7 @@ public class SteamManager : MonoBehaviour {
             if ( activeSteamSocketServer ) { steamSocketManager.Receive(); }
             if ( activeSteamSocketConnection ) { steamConnectionManager.Receive(); }
         }
-        catch { Debug.Log("Error recieving data on socket/connection"); }
+        catch { Debug.LogError("Error recieving data on socket/connection"); }
     }
 
     public void ActivateDataManager() {
@@ -61,14 +61,16 @@ public class SteamManager : MonoBehaviour {
         steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(PlayerSteamId);
         activeSteamSocketServer = true;
         activeSteamSocketConnection = true;
-        if (steamConnectionManager != null) { Debug.Log("Server created"); }
+        if (steamConnectionManager != null) {
+            Debug.Log("Server created and joined");
+        }
     }
 
     public void JoinSteamSocketServer() {
         steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(FriendSteamId, 0);
         activeSteamSocketServer = false;
         activeSteamSocketConnection = true;
-        if (steamConnectionManager != null) { Debug.Log("Server joined"); }
+        if (steamConnectionManager != null) Debug.Log("Server joined");
     }
 
     public void LeaveSteamSocketServer() {

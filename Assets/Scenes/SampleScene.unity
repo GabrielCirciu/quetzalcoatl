@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 1481.7754, g: 1835.8867, b: 2430.4492, a: 1}
+  m_IndirectSpecularColor: {r: 1481.7451, g: 1835.5391, b: 2429.8105, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -19199,7 +19199,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: " - Adjusted camera clipping\n - Fixed infinite jump\n - Fixed cursor locking
-    on disconnect/ leave"
+    on disconnect/ leave\n - Added In-Game player list (experimental)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 6a72a4f7b255b964a95ae7edcc03b447, type: 2}
   m_sharedMaterial: {fileID: -5869629922348858554, guid: 6a72a4f7b255b964a95ae7edcc03b447, type: 2}
@@ -37986,7 +37986,7 @@ MonoBehaviour:
   physicalParameters:
     m_Iso: 200
     m_ShutterSpeed: 0.005
-    m_Aperture: 1.4
+    m_Aperture: 2
     m_BladeCount: 9
     m_Curvature: {x: 2, y: 11}
     m_BarrelClipping: 0.25
@@ -38092,16 +38092,16 @@ Camera:
   m_FOVAxisMode: 0
   m_SensorSize: {x: 36, y: 24}
   m_LensShift: {x: 0, y: 0}
-  m_FocalLength: 50
+  m_FocalLength: 40
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
     y: 0
     width: 1
     height: 1
-  near clip plane: 4
+  near clip plane: 0.3
   far clip plane: 1000
-  field of view: 26.991467
+  field of view: 33.39849
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -38126,8 +38126,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1922889286}
-  m_LocalRotation: {x: -0.000000074505806, y: 0.7071068, z: -0.000000035390258, w: -0.70710677}
-  m_LocalPosition: {x: 28.72, y: 3.9828541, z: 0.55232763}
+  m_LocalRotation: {x: 0.5425811, y: 0.10536864, z: 0.12730749, w: -0.82358736}
+  m_LocalPosition: {x: -3.4893813, y: 3.7002354, z: -6.5052705}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1086288951}

@@ -6,6 +6,7 @@ public class DataManager : MonoBehaviour {
 
     public SteamManager steamManager;
     public ChatManager chatManager;
+    public CurrentPlayerList currentPlayerList;
 
     void Start() {
         steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
@@ -23,6 +24,7 @@ public class DataManager : MonoBehaviour {
             // PLAYER JOINED: "o" (111 in UTF8-Hex): Send player joined chat message
             case 111:
                 chatManager.JoinedChatMessage(dataArray);
+                currentPlayerList.AddToCurrentPlayerList(dataArray);
                 break;
         }
     }

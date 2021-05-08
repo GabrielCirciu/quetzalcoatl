@@ -1,8 +1,7 @@
 To do:
 
 Fixing and slight improvements:
-	Implement disconnect message
-	Player-list in-game
+	Add On-Disconnect message and remove from player list
 	Make Single-Player actually single-player (or private server)
 
 Network:

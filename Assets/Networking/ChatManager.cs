@@ -20,7 +20,7 @@ public class ChatManager : MonoBehaviour {
     public List<Message> messageList = new List<Message>();
     public class Message {
         public int namelength, overflow;
-        public string identifier, timestamp, name, text;
+        public string timestamp, name, text;
         public TMP_Text textText;
     }
 

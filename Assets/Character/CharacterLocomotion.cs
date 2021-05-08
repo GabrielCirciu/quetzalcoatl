@@ -41,7 +41,7 @@ public class CharacterLocomotion : MonoBehaviour {
                     charController.center = new Vector3(0f, 0.92f, 0f);
                     charAnimator.SetFloat(motionHash, 0f);
                 }
-                else {
+                else if ( isGrounded ) {
                     gravityVector.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
                     charAnimator.Play("Jump");
                 }

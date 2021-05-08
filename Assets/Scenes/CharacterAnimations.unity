@@ -1111,7 +1111,7 @@ MonoBehaviour:
   m_TransparentLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_MinimumDistanceFromTarget: 0.5
+  m_MinimumDistanceFromTarget: 0.01
   m_AvoidObstacles: 1
   m_DistanceLimit: 0
   m_MinimumOcclusionTime: 0
@@ -1763,6 +1763,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae2b1c08db016bd49bd85bf176719fa6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  steamManager: {fileID: 0}
   chatInputField: {fileID: 1023351251}
   cinemachineCamera: {fileID: 260459115}
   chatCanvas: {fileID: 1713448404}

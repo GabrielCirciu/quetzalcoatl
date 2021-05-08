@@ -5,6 +5,10 @@ using UnityEngine;
 public class MainMenuManager : MonoBehaviour {
     public GameObject ChangelogPanel, ExtrasCanvas, CreditsCanvas, MainMenuCanvas, OptionsCanvas, PlayCanvas, PlayerCanvas;
 
+    void Start() {
+        Cursor.lockState = CursorLockMode.None;
+    }
+
     public void OnPlayButtonPressed() {
         PlayCanvas.SetActive(!PlayCanvas.activeSelf);
         MainMenuCanvas.SetActive(!MainMenuCanvas.activeSelf);

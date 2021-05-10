@@ -10,7 +10,7 @@ public class WorldManager : MonoBehaviour {
 
     private void Awake(){
         if ( _instance == null ) {
-            DontDestroyOnLoad(this.gameObject);
+            DontDestroyOnLoad(gameObject);
             _instance = this;
         }
         else if ( _instance != this ) { Destroy(gameObject); }

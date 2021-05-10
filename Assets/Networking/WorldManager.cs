@@ -40,6 +40,6 @@ public class WorldManager : MonoBehaviour {
     }
 
     public void ReturnToMainMenu() {
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("MenuScene");
     }
 }

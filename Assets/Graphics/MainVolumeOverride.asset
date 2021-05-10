@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
-  m_Name: CameraVolumeGraphicsOverride
+  m_Name: MainVolumeOverride
   m_EditorClassIdentifier: 
   components:
   - {fileID: 7686318427622180703}
@@ -277,12 +277,12 @@ MonoBehaviour:
     max: 360
   skyIntensityMode:
     m_OverrideState: 0
-    m_Value: 0
+    m_Value: 2
   exposure:
     m_OverrideState: 0
     m_Value: 0
   multiplier:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 1
     min: 0
   upperHemisphereLuxValue:
@@ -610,12 +610,12 @@ MonoBehaviour:
     max: 1
   cascadeShadowSplitCount:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 2
     min: 1
     max: 4
   cascadeShadowSplit0:
     m_OverrideState: 1
-    m_Value: 0.118
+    m_Value: 0.25
   cascadeShadowSplit1:
     m_OverrideState: 1
     m_Value: 0.5
@@ -626,11 +626,11 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: NaN
   cascadeShadowBorder1:
-    m_OverrideState: 1
-    m_Value: 0.4587156
+    m_OverrideState: 0
+    m_Value: 0.5
   cascadeShadowBorder2:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: NaN
   cascadeShadowBorder3:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 0.48

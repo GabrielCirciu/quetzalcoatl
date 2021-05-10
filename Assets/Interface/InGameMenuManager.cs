@@ -1,33 +1,29 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
-using UnityEngine.SceneManagement;
 
 public class InGameMenuManager : MonoBehaviour {
     public GameObject inGameMenuPanel, cinemachineCamera;
     public ChatManager chatManager;
-    CinemachineFreeLook cameraFreeLook;
+    private CinemachineFreeLook _cinemachineFreeLook;
+    private CameraControls _cameraControls;
+    private SteamManager _steamManager;
 
-    WorldManager worldManager;
-    SteamManager steamManager;
-
-    void Start() {
-        cameraFreeLook = cinemachineCamera.GetComponent<CinemachineFreeLook>();
+    private void Start() {
+        _cinemachineFreeLook = cinemachineCamera.GetComponent<CinemachineFreeLook>();
+        _cameraControls = cinemachineCamera.GetComponent<CameraControls>();
         inGameMenuPanel.SetActive(false);
-        worldManager = GameObject.Find("WorldManager").GetComponent<WorldManager>();
-        steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
+        _steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
     }
 
-    void Update() {
+    private void Update() {
         if ( Input.GetKeyDown(KeyCode.Escape) ) {
             if ( !chatManager.isChatWindowOpen ) {
                 inGameMenuPanel.SetActive(!inGameMenuPanel.activeSelf);
                 if ( inGameMenuPanel.activeSelf ) {
                     Cursor.lockState = CursorLockMode.None;
-                    cameraFreeLook.m_YAxis.m_MaxSpeed = 0f;
-                    cameraFreeLook.m_XAxis.m_MaxSpeed = 0f;
-                    cinemachineCamera.GetComponent<CameraControls>().enabled = false;
+                    _cinemachineFreeLook.m_YAxis.m_MaxSpeed = 0f;
+                    _cinemachineFreeLook.m_XAxis.m_MaxSpeed = 0f;
+                    _cameraControls.enabled = false;
                 }
                 else OnResumeButtonPressed();
             }
@@ -37,10 +33,10 @@ public class InGameMenuManager : MonoBehaviour {
 
     public void OnResumeButtonPressed() {
         Cursor.lockState = CursorLockMode.Locked;
-        cameraFreeLook.m_YAxis.m_MaxSpeed = 0.01f;
-        cameraFreeLook.m_XAxis.m_MaxSpeed = 1f;
+        _cinemachineFreeLook.m_YAxis.m_MaxSpeed = 0.01f;
+        _cinemachineFreeLook.m_XAxis.m_MaxSpeed = 1f;
         inGameMenuPanel.SetActive(false);
-        cinemachineCamera.GetComponent<CameraControls>().enabled = true;
+        _cameraControls.enabled = true;
     }
 
     public void OnOptionsButtonPressed() {
@@ -48,7 +44,7 @@ public class InGameMenuManager : MonoBehaviour {
     }
 
     public void OnMainMenuButtonPressed() {
-        steamManager.LeaveSteamSocketServer();
+        _steamManager.LeaveSteamSocketServer();
     }
 
     public void OnExitButtonPressed() {

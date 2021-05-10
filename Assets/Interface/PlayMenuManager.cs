@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayMenuManager : MonoBehaviour {
@@ -10,12 +8,12 @@ public class PlayMenuManager : MonoBehaviour {
     public SteamManager steamManager;
     public WorldManager worldManager;
 
-    void OnEnable() {
+    private void OnEnable() {
         characterSelectionPanel.SetActive(true);
         playModePanel.SetActive(false);
     }
 
-    void Update() {
+    private void Update() {
         if ( Input.GetKeyDown(KeyCode.Escape) ) mainMenuManager.OnPlayButtonPressed();
     }
 

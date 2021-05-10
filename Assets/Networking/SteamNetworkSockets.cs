@@ -19,13 +19,13 @@ public class SteamSocketManager : SocketManager {
         Debug.Log("Server has been shut down");
 	}
 	public override void OnMessage(Connection connection, NetIdentity identity, IntPtr data, int size, long messageNum, long recvTime, int channel) {
-		SteamManager.Instance.RelaySocketMessageReceived(data, size, connection.Id);
+		SteamManager.instance.RelaySocketMessageReceived(data, size, connection.Id);
 	}
 }
 
 // Connection Manager for enabling all player connections to socket server
 public class SteamConnectionManager : ConnectionManager {
-    public WorldManager worldManager;
+    private WorldManager _worldManager;
     
     public override void OnConnecting(ConnectionInfo info) {
         base.OnConnecting(info);
@@ -34,16 +34,16 @@ public class SteamConnectionManager : ConnectionManager {
     public override void OnConnected(ConnectionInfo info) {
         base.OnConnected(info);
         Debug.Log("Connected to server as client");
-        worldManager = GameObject.Find("WorldManager").GetComponent<WorldManager>();
-        worldManager.JoinMultiPlayerWorld();
+        _worldManager = GameObject.Find("WorldManager").GetComponent<WorldManager>();
+        _worldManager.JoinMultiPlayerWorld();
     }
     public override void OnDisconnected(ConnectionInfo info) {
         base.OnDisconnected(info);
         Debug.Log("Disconnected from server");
-        worldManager = GameObject.Find("WorldManager").GetComponent<WorldManager>();
-        worldManager.ReturnToMainMenu();
+        _worldManager = GameObject.Find("WorldManager").GetComponent<WorldManager>();
+        _worldManager.ReturnToMainMenu();
     }
     public override void OnMessage(IntPtr data, int size, long messageNum, long recvTime, int channel) {
-        SteamManager.Instance.ProcessMessageFromSocketServer(data, size);
+        SteamManager.instance.ProcessMessageFromSocketServer(data, size);
     }
 }

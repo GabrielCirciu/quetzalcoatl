@@ -1,40 +1,39 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class MainMenuManager : MonoBehaviour {
-    public GameObject ChangelogPanel, ExtrasCanvas, CreditsCanvas, MainMenuCanvas, OptionsCanvas, PlayCanvas, PlayerCanvas;
+public class MainMenuManager : MonoBehaviour
+{
+    public GameObject changelogPanel, extrasCanvas, creditsCanvas, mainMenuCanvas, optionsCanvas, playCanvas, playerInfoCanvas;
 
-    void Start() {
+    private void Start() {
         Cursor.lockState = CursorLockMode.None;
     }
 
     public void OnPlayButtonPressed() {
-        PlayCanvas.SetActive(!PlayCanvas.activeSelf);
-        MainMenuCanvas.SetActive(!MainMenuCanvas.activeSelf);
-        ChangelogPanel.SetActive(false);
-        ExtrasCanvas.SetActive(!ExtrasCanvas.activeSelf);
-        PlayerCanvas.SetActive(!PlayerCanvas.activeSelf);
+        playCanvas.SetActive(!playCanvas.activeSelf);
+        mainMenuCanvas.SetActive(!mainMenuCanvas.activeSelf);
+        changelogPanel.SetActive(false);
+        extrasCanvas.SetActive(!extrasCanvas.activeSelf);
+        playerInfoCanvas.SetActive(!playerInfoCanvas.activeSelf);
     }
 
     public void OnOptionsButtonPressed() {
-        OptionsCanvas.SetActive(!OptionsCanvas.activeSelf);
-        MainMenuCanvas.SetActive(!MainMenuCanvas.activeSelf);
-        ChangelogPanel.SetActive(false);
-        ExtrasCanvas.SetActive(!ExtrasCanvas.activeSelf);
-        PlayerCanvas.SetActive(!PlayerCanvas.activeSelf);
+        optionsCanvas.SetActive(!optionsCanvas.activeSelf);
+        mainMenuCanvas.SetActive(!mainMenuCanvas.activeSelf);
+        changelogPanel.SetActive(false);
+        extrasCanvas.SetActive(!extrasCanvas.activeSelf);
+        playerInfoCanvas.SetActive(!playerInfoCanvas.activeSelf);
     }
 
     public void OnCreditsButtonPressed() {
-        CreditsCanvas.SetActive(!CreditsCanvas.activeSelf);
-        MainMenuCanvas.SetActive(!MainMenuCanvas.activeSelf);
-        ChangelogPanel.SetActive(false);
-        ExtrasCanvas.SetActive(!ExtrasCanvas.activeSelf);
-        PlayerCanvas.SetActive(!PlayerCanvas.activeSelf);
+        creditsCanvas.SetActive(!creditsCanvas.activeSelf);
+        mainMenuCanvas.SetActive(!mainMenuCanvas.activeSelf);
+        changelogPanel.SetActive(false);
+        extrasCanvas.SetActive(!extrasCanvas.activeSelf);
+        playerInfoCanvas.SetActive(!playerInfoCanvas.activeSelf);
     }
 
     public void OnChangelogButtonPressed() {
-        ChangelogPanel.SetActive(!ChangelogPanel.activeSelf);
+        changelogPanel.SetActive(!changelogPanel.activeSelf);
     }
 
     public void OnExitButtonPressed() {

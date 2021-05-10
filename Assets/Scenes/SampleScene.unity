@@ -14441,7 +14441,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   friendListContentPanel: {fileID: 759217992}
   friendObj: {fileID: 6620892245783275177, guid: 6b7d4db15cfbfe543b9d57d72e4798ce, type: 3}
-  friendList: []
   friendButton: {fileID: 0}
 --- !u!1 &741070881
 GameObject:
@@ -27953,7 +27952,6 @@ MonoBehaviour:
   activeSteamSocketServer: 0
   activeSteamSocketConnection: 0
   dataManager: {fileID: 0}
-  worldManager: {fileID: 272661425}
 --- !u!1 &1559602079
 GameObject:
   m_ObjectHideFlags: 0
@@ -28444,13 +28442,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 240ad065f3338be45a6ef0d052c19dbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ChangelogPanel: {fileID: 1580854470}
-  ExtrasCanvas: {fileID: 115392745}
-  CreditsCanvas: {fileID: 602002068}
-  MainMenuCanvas: {fileID: 1713941746}
-  OptionsCanvas: {fileID: 1830397256}
-  PlayCanvas: {fileID: 743030401}
-  PlayerCanvas: {fileID: 208486025}
+  changelogPanel: {fileID: 1580854470}
+  extrasCanvas: {fileID: 115392745}
+  creditsCanvas: {fileID: 602002068}
+  mainMenuCanvas: {fileID: 1713941746}
+  optionsCanvas: {fileID: 1830397256}
+  playCanvas: {fileID: 743030401}
+  playerInfoCanvas: {fileID: 208486025}
 --- !u!4 &1578416540
 Transform:
   m_ObjectHideFlags: 0

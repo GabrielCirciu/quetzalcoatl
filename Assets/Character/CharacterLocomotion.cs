@@ -1,85 +1,83 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CharacterLocomotion : MonoBehaviour {
 
-    CharacterController charController;
-    Animator charAnimator;
-    Vector3 charDirection, charFinalDirection, gravityVector;
-    Transform camTransform;
-    int motionHash, speedHash;
-    float xInputAxis, zInputAxis, charSpeed, gravity, groundDistance, jumpHeight;
-    float targetAngle, finalAngle, turnSmoothTime, turnSmoothVelocity;
+    private CharacterController _characterController;
+    private Animator _charAnimator;
+    private Vector3 _charDirection, _charFinalDirection, _gravityVector;
+    private Transform _camTransform;
+    private int _motionHash, _speedHash;
+    private float _xInputAxis, _zInputAxis, _charSpeed, _gravity, _groundDistance, _jumpHeight;
+    private float _targetAngle, _finalAngle, _turnSmoothTime, _turnSmoothVelocity;
     public Transform lookAtObj, groundCheck;
     public LayerMask groundMask;
-    bool isGrounded;
+    private bool _isGrounded;
 
-    void Start() {
-        charController = GetComponent<CharacterController>();
-        charAnimator = GetComponent<Animator>();
-        motionHash = Animator.StringToHash("Motion");
-        speedHash = Animator.StringToHash("Speed");
-        camTransform = Camera.main.transform;
-        turnSmoothTime = 0.1f;
-        gravity = -30f;
-        groundDistance = 0.1f;
-        jumpHeight = 2f;
+    private void Start() {
+        _characterController = GetComponent<CharacterController>();
+        _charAnimator = GetComponent<Animator>();
+        _motionHash = Animator.StringToHash("Motion");
+        _speedHash = Animator.StringToHash("Speed");
+        _camTransform = Camera.main.transform;
+        _turnSmoothTime = 0.1f;
+        _gravity = -30f;
+        _groundDistance = 0.1f;
+        _jumpHeight = 2f;
     }
 
-    void Update() {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-        if ( isGrounded && gravityVector.y < 0 ) gravityVector.y = -3f;
+    private void Update() {
+        _isGrounded = Physics.CheckSphere(groundCheck.position, _groundDistance, groundMask);
+        if ( _isGrounded && _gravityVector.y < 0 ) _gravityVector.y = -3f;
         
-        xInputAxis = Input.GetAxisRaw("Horizontal");
-        zInputAxis = Input.GetAxisRaw("Vertical");
-        charDirection = new Vector3(xInputAxis, 0f, zInputAxis).normalized;
+        _xInputAxis = Input.GetAxisRaw("Horizontal");
+        _zInputAxis = Input.GetAxisRaw("Vertical");
+        _charDirection = new Vector3(_xInputAxis, 0f, _zInputAxis).normalized;
 
         if ( Input.GetKeyDown(KeyCode.Space) )
-            if ( charAnimator.GetFloat(motionHash) < 0 ) {
-                    charController.height = 1.8f;
-                    charController.center = new Vector3(0f, 0.92f, 0f);
-                    charAnimator.SetFloat(motionHash, 0f);
-                }
-                else if ( isGrounded ) {
-                    gravityVector.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-                    charAnimator.Play("Jump");
-                }
+            if ( _charAnimator.GetFloat(_motionHash) < 0 ) {
+                _characterController.height = 1.8f;
+                _characterController.center = new Vector3(0f, 0.92f, 0f);
+                _charAnimator.SetFloat(_motionHash, 0f);
+            }
+            else if ( _isGrounded ) {
+                _gravityVector.y = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
+                _charAnimator.Play("Jump");
+            }
 
-        gravityVector.y += Time.deltaTime * gravity;
-        charController.Move(gravityVector * Time.deltaTime);
+        _gravityVector.y += Time.deltaTime * _gravity;
+        _characterController.Move(_gravityVector * Time.deltaTime);
 
         if ( Input.GetKeyDown(KeyCode.LeftControl) )
-            if ( charAnimator.GetFloat(motionHash) < 0 ) {
-                    charController.height = 1.8f;
-                    charController.center = new Vector3(0f, 0.92f, 0f);
-                    charAnimator.SetFloat(motionHash, 0f);
-                }
-                else {
-                    charController.height = 1.5f;
-                    charController.center = new Vector3(0f, 0.79f, 0f);
-                    charAnimator.SetFloat(motionHash, -1f);
-                }
+            if ( _charAnimator.GetFloat(_motionHash) < 0 ) {
+                    _characterController.height = 1.8f;
+                    _characterController.center = new Vector3(0f, 0.92f, 0f);
+                    _charAnimator.SetFloat(_motionHash, 0f);
+            }
+            else {
+                _characterController.height = 1.5f;
+                _characterController.center = new Vector3(0f, 0.79f, 0f);
+                _charAnimator.SetFloat(_motionHash, -1f);
+            }
 
-        if ( charDirection.magnitude > 0.1f ) {
-            if ( charAnimator.GetFloat(motionHash) < 0 ) { charSpeed = 2f; }
-            else if ( Input.GetKey(KeyCode.LeftShift) ) { charSpeed = 10f; }
-            else if ( Input.GetKey(KeyCode.LeftAlt) ) { charSpeed = 2f; }
-            else { charSpeed = 5f; }
+        if ( _charDirection.magnitude > 0.1f ) {
+            if ( _charAnimator.GetFloat(_motionHash) < 0 ) { _charSpeed = 2f; }
+            else if ( Input.GetKey(KeyCode.LeftShift) ) { _charSpeed = 10f; }
+            else if ( Input.GetKey(KeyCode.LeftAlt) ) { _charSpeed = 2f; }
+            else { _charSpeed = 5f; }
 
-            targetAngle = Mathf.Atan2(charDirection.x, charDirection.z) * Mathf.Rad2Deg + camTransform.eulerAngles.y;
-            finalAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            transform.rotation = Quaternion.Euler(0f, finalAngle, 0f);
-            charFinalDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-            charController.Move(charFinalDirection * charSpeed * Time.deltaTime);
+            _targetAngle = Mathf.Atan2(_charDirection.x, _charDirection.z) * Mathf.Rad2Deg + _camTransform.eulerAngles.y;
+            _finalAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetAngle, ref _turnSmoothVelocity, _turnSmoothTime);
+            transform.rotation = Quaternion.Euler(0f, _finalAngle, 0f);
+            _charFinalDirection = Quaternion.Euler(0f, _targetAngle, 0f) * Vector3.forward ;
+            _characterController.Move(_charFinalDirection * _charSpeed * Time.deltaTime);
         }
-        else charSpeed = 0f;
+        else _charSpeed = 0f;
 
-        charAnimator.SetFloat(speedHash, charSpeed, 0.1f, Time.deltaTime);
+        _charAnimator.SetFloat(_speedHash, _charSpeed, 0.1f, Time.deltaTime);
     }
 
-    void OnAnimatorIK() {
-        charAnimator.SetLookAtWeight(0.5f);
-        charAnimator.SetLookAtPosition(lookAtObj.position);        
+    private  void OnAnimatorIK(int playerIndex) {
+        _charAnimator.SetLookAtWeight(0.5f);
+        _charAnimator.SetLookAtPosition(lookAtObj.position);        
     }
 }

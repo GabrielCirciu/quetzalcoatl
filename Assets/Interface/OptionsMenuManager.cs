@@ -1,19 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class OptionsMenuManager : MonoBehaviour {
     public MainMenuManager mainMenuManager;
     public GameObject videoPanel, audioPanel, gamePanel, controlPanel;
 
-    void OnEnable() {
+    private void OnEnable() {
         videoPanel.SetActive(true);
         audioPanel.SetActive(false);
         gamePanel.SetActive(false);
         controlPanel.SetActive(false);
     }
 
-    void Update() {
+    private void Update() {
         if ( Input.GetKeyDown(KeyCode.Escape) ) {
             mainMenuManager.OnOptionsButtonPressed();
         }

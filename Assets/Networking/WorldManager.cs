@@ -1,21 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Steamworks;
 using System;
 
 public class WorldManager : MonoBehaviour {
-    public static WorldManager Instance;
+    private static WorldManager _instance;
     public SteamManager steamManager;
     public GameObject chatManagerObj;
 
-    void Awake(){
-        if ( Instance == null ) {
+    private void Awake(){
+        if ( _instance == null ) {
             DontDestroyOnLoad(this.gameObject);
-            Instance = this;
+            _instance = this;
         }
-        else if ( Instance != this ) { Destroy(gameObject); }
+        else if ( _instance != this ) { Destroy(gameObject); }
     }
 
     public void StartSinglePlayerWorld() {
@@ -28,15 +26,16 @@ public class WorldManager : MonoBehaviour {
 
     public void JoinMultiPlayerWorld() {
         SceneManager.LoadScene("CharacterAnimations");
-        string messageIdentifier = "o";
-        string messageTimeStamp = DateTime.Now.ToString("HH:mm");
-        string messageName = SteamClient.Name.ToString();
-        int messageNameLength = messageName.Length;
-        int messageNameOverflow = 0;
-        if (messageNameLength > 9) messageNameOverflow = 1;
-        string joinedText = " has joined the world!";
-        string encodedMessage = messageIdentifier+messageNameOverflow+messageNameLength.ToString()+messageTimeStamp+messageName+joinedText;
-        byte[] messageToByte = System.Text.Encoding.UTF8.GetBytes(encodedMessage);
+        const string messageIdentifier = "o";
+        var messageTimeStamp = DateTime.Now.ToString("HH:mm");
+        var messageName = SteamClient.Name;
+        var messageNameLength = messageName.Length;
+        var messageNameOverflow = 0;
+        if ( messageNameLength > 9 ) messageNameOverflow = 1;
+        const string joinedText = " has joined the world!";
+        var encodedMessage = messageIdentifier + messageNameOverflow + messageNameLength + messageTimeStamp +
+                             messageName + joinedText;
+        var messageToByte = System.Text.Encoding.UTF8.GetBytes(encodedMessage);
         steamManager.SendMessageToSocketServer(messageToByte);
     }
 

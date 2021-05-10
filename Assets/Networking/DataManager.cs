@@ -8,7 +8,7 @@ public class DataManager : MonoBehaviour {
     public ChatManager chatManager;
     public CurrentPlayerList currentPlayerList;
 
-    void Start() {
+    private void Start() {
         steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
         steamManager.ActivateDataManager();
     }
@@ -19,7 +19,7 @@ public class DataManager : MonoBehaviour {
         switch ( dataArray[0] ) {
             // CHAT MESSAGE: "n" (110 in UTF8-Hex): Send chat message
             case 110:
-                chatManager.RecieveChatMessage(dataArray);
+                chatManager.ReceiveChatMessage(dataArray);
                 break;
             // PLAYER JOINED: "o" (111 in UTF8-Hex): Send player joined chat message
             case 111:

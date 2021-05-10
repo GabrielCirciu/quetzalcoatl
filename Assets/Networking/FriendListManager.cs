@@ -1,69 +1,79 @@
 using Steamworks;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class FriendListManager : MonoBehaviour {
-    
-    int friendListLength = 0;
+public class FriendListManager : MonoBehaviour
+{
+    private int _friendListLength;
     public GameObject friendListContentPanel, friendObj;
-    [SerializeField]
-    List<SteamFriendInfo> friendList = new List<SteamFriendInfo>();
-    [Serializable]
-    public class SteamFriendInfo {
+    private readonly List<SteamFriendInfo> _friendList = new List<SteamFriendInfo>();
+    private class SteamFriendInfo
+    {
         public TMP_Text nameText;
         public RawImage avatar;
     }
     public FriendButton friendButton;
 
-    public void GetSteamFriends() {
-        if ( friendListLength != 0 ) {
-            for ( int i = 0; i < friendListLength; i++ ) {
-                Destroy(friendList[0].nameText.transform.parent.gameObject);
-                friendList.Remove(friendList[0]);
+    public void GetSteamFriends()
+    {
+        if ( _friendListLength != 0 )
+        {
+            for ( var i = 0; i < _friendListLength; i++ )
+            {
+                Destroy(_friendList[0].nameText.transform.parent.gameObject);
+                _friendList.Remove(_friendList[0]);
             }
-            friendListLength = 0;
+            _friendListLength = 0;
         }
         GetPlayingFriends();
         GetOnlineFriends();
         GetOfflineFriends();
     }
 
-    void GetPlayingFriends() {
+    private void GetPlayingFriends() {
         foreach ( var friend in SteamFriends.GetFriends() ) {
             if ( friend.IsPlayingThisGame ) PopulateFriendList(friend, 1);  
         }
     }
 
-    void GetOnlineFriends() {
+    private void GetOnlineFriends() {
         foreach ( var friend in SteamFriends.GetFriends() ) {
             if ( friend.IsOnline && !friend.IsPlayingThisGame ) PopulateFriendList(friend, 2);
         }
     }
 
-    void GetOfflineFriends() {
+    private void GetOfflineFriends() {
         foreach ( var friend in SteamFriends.GetFriends() ) {
             if ( !friend.IsOnline ) PopulateFriendList(friend, 3);
         }
     }
 
-    async void PopulateFriendList(Friend friend, int status) {
-        friendListLength++;
+    private async void PopulateFriendList(Friend friend, int status) {
+        _friendListLength++;
         await friend.RequestInfoAsync();
-        SteamFriendInfo newFriend = new SteamFriendInfo();
-        GameObject newFriendObj = Instantiate(friendObj, friendListContentPanel.transform);
+        var newFriend = new SteamFriendInfo();
+        var newFriendObj = Instantiate(friendObj, friendListContentPanel.transform);
         newFriend.nameText = newFriendObj.GetComponentInChildren<TMP_Text>();
-        if ( status == 1 ) newFriend.nameText.text = "<color=#69FF69>"+friend.Name+"</color>";
-        else if ( status == 2 ) newFriend.nameText.text = "<color=#69D0FF>"+friend.Name+"</color>";
-        else if ( status == 3 ) newFriend.nameText.text = "<color=#696969>"+friend.Name+"</color>";
-        friendList.Add(newFriend);
+        switch (status)
+        {
+            case 1:
+                newFriend.nameText.text = "<color=#69FF69>" + friend.Name + "</color>";
+                break;
+            case 2:
+                newFriend.nameText.text = "<color=#69D0FF>" + friend.Name + "</color>";
+                break;
+            case 3:
+                newFriend.nameText.text = "<color=#69D0FF>" + friend.Name + "</color>";
+                break;
+        }
+        _friendList.Add(newFriend);
         friendButton = newFriendObj.GetComponent<FriendButton>();
-        friendButton.steamID = friend.Id;
+        friendButton.SteamID = friend.Id;
         newFriend.avatar = newFriendObj.GetComponentInChildren<RawImage>();
         var imageData = await SteamFriends.GetSmallAvatarAsync(friend.Id);
-        Texture2D newImage = new Texture2D((int)imageData.Value.Width, (int)imageData.Value.Height, TextureFormat.RGBA32, false, false);
+        var newImage = new Texture2D((int)imageData.Value.Width, (int)imageData.Value.Height, TextureFormat.RGBA32, false, false);
         newImage.LoadRawTextureData(imageData.Value.Data);
         newImage.Apply();
         newFriend.avatar.texture = newImage;

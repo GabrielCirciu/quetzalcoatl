@@ -21,7 +21,7 @@ public class SteamManager : MonoBehaviour {
     private void Awake(){
         if ( instance == null ){
             _firstInstance = true;
-            DontDestroyOnLoad(this.gameObject);
+            DontDestroyOnLoad(gameObject);
             instance = this;
             try{ 
                 SteamClient.Init(GameAppId);
@@ -63,14 +63,14 @@ public class SteamManager : MonoBehaviour {
     }
 
     public void LeaveSteamSocketServer() {
-        activeSteamSocketServer = false;
-        activeSteamSocketConnection = false;
         try {
-            _steamConnectionManager.Close();
             _steamSocketManager.Close();
+            _steamConnectionManager.Close();
             Debug.Log("Left the server");
         }
         catch { Debug.Log("Error closing socket server / connection manager"); }
+        activeSteamSocketServer = false;
+        activeSteamSocketConnection = false;
     }
 
     public void RelaySocketMessageReceived(IntPtr message, int size, uint connectionSendingMessageId) {

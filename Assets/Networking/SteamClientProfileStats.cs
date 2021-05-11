@@ -4,11 +4,11 @@ using UnityEngine.UI;
 using TMPro;
 
 public class SteamClientProfileStats : MonoBehaviour {
-    TMP_Text _displayName;
+    private TMP_Text _displayName;
     public GameObject displayNameObj;
     public RawImage displaySteamImage;
 
-    void Start() {
+    private void Start() {
         if (SteamClient.IsValid) {
             _displayName = displayNameObj.GetComponent<TMP_Text>();
             GetSteamImage();
@@ -16,7 +16,7 @@ public class SteamClientProfileStats : MonoBehaviour {
         else Application.Quit();
     }
 
-    async void GetSteamImage() {
+    private async void GetSteamImage() {
         _displayName.text = SteamClient.Name;
         var spImageData = await SteamFriends.GetLargeAvatarAsync(SteamClient.SteamId);
         var spImage = new Texture2D((int)spImageData.Value.Width, (int)spImageData.Value.Height, TextureFormat.RGBA32, false, false);

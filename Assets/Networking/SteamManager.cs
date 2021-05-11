@@ -93,7 +93,6 @@ public class SteamManager : MonoBehaviour {
     }
 
     public bool SendMessageToSocketServer(byte[] messageToSend) {
-        Debug.Log("Data sent to server");
         try {
             var sizeOfMessage = messageToSend.Length;
             var intPtrMessage = System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeOfMessage);
@@ -101,6 +100,7 @@ public class SteamManager : MonoBehaviour {
             var success = _steamConnectionManager.Connection.SendMessage(intPtrMessage, sizeOfMessage);
             if (success == Result.OK) {
                 System.Runtime.InteropServices.Marshal.FreeHGlobal(intPtrMessage); // Free up memory at pointer
+                Debug.Log("Data sent to server");
                 return true;
             }
             else return false;

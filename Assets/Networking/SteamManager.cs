@@ -86,7 +86,6 @@ public class SteamManager : MonoBehaviour {
                     var success = _steamSocketManager.Connected[i].SendMessage(message, size);
                     if (success != Result.OK) Debug.Log("Socket Message could not be relayed");
                     else Debug.Log("Socket Message relayed from Server");
-                    //Result success ? Debug.Log("1") : Debug.Log("2");
                 }
             }
         }

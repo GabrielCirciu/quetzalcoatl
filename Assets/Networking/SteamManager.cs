@@ -23,13 +23,18 @@ public class SteamManager : MonoBehaviour {
             _firstInstance = true;
             DontDestroyOnLoad(gameObject);
             instance = this;
-            try{ 
+            try
+            {
                 SteamClient.Init(GameAppId);
-                if ( !SteamClient.IsValid ) throw new Exception();
+                if (!SteamClient.IsValid) throw new Exception();
                 PlayerSteamId = SteamClient.SteamId;
                 SteamNetworkingUtils.InitRelayNetworkAccess();
             }
-            catch ( Exception e ){ Debug.LogError($"Steam not initialized. Exception: {e}"); }
+            catch (Exception e)
+            {
+                Debug.LogError($"Steam not initialized. Exception: {e}");
+                Application.Quit();
+            }
         }
         else if ( instance != this ) { Destroy(gameObject); }
     }
@@ -76,10 +81,12 @@ public class SteamManager : MonoBehaviour {
     public void RelaySocketMessageReceived(IntPtr message, int size, uint connectionSendingMessageId) {
         try {
             for (var i = 0; i < _steamSocketManager.Connected.Count; i++) {
-                if (_steamSocketManager.Connected[i].Id != connectionSendingMessageId) {
+                if (_steamSocketManager.Connected[i].Id != connectionSendingMessageId)
+                {
                     var success = _steamSocketManager.Connected[i].SendMessage(message, size);
                     if (success != Result.OK) Debug.Log("Socket Message could not be relayed");
                     else Debug.Log("Socket Message relayed from Server");
+                    //Result success ? Debug.Log("1") : Debug.Log("2");
                 }
             }
         }

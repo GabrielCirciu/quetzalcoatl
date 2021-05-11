@@ -32,15 +32,22 @@ public class FriendListManager : MonoBehaviour
         GetOfflineFriends();
     }
 
-    private void GetPlayingFriends() {
+    private void GetPlayingFriends()
+    {
         foreach ( var friend in SteamFriends.GetFriends() ) {
-            if ( friend.IsPlayingThisGame ) PopulateFriendList(friend, 1);  
+            if (friend.IsPlayingThisGame)
+            {
+                PopulateFriendList(friend, 1);
+            }
         }
     }
 
     private void GetOnlineFriends() {
         foreach ( var friend in SteamFriends.GetFriends() ) {
-            if ( friend.IsOnline && !friend.IsPlayingThisGame ) PopulateFriendList(friend, 2);
+            if (friend.IsOnline && !friend.IsPlayingThisGame)
+            {
+                PopulateFriendList(friend, 2);
+            }
         }
     }
 
@@ -65,7 +72,7 @@ public class FriendListManager : MonoBehaviour
                 newFriend.nameText.text = "<color=#69D0FF>" + friend.Name + "</color>";
                 break;
             case 3:
-                newFriend.nameText.text = "<color=#69D0FF>" + friend.Name + "</color>";
+                newFriend.nameText.text = "<color=#505050>" + friend.Name + "</color>";
                 break;
         }
         _friendList.Add(newFriend);

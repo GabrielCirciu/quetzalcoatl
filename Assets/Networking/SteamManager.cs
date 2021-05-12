@@ -53,32 +53,47 @@ public class SteamManager : MonoBehaviour {
     }
 
     public void CreateSteamSocketServer() {
+        Debug.Log("SERVER: Attempting to create socket");
         _steamSocketManager = SteamNetworkingSockets.CreateRelaySocket<SteamSocketManager>();
+        if (_steamSocketManager == null) Debug.LogError("SERVER: Socket Manager = null");
         _steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(PlayerSteamId);
+        if (_steamConnectionManager == null) Debug.LogError("SERVER: Connection Manager = null");
         activeSteamSocketServer = true;
         activeSteamSocketConnection = true;
-        if (_steamConnectionManager == null) Debug.LogError("SERVER: Connection Manager = null");
     }
 
     public void JoinSteamSocketServer() {
         _steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(FriendSteamId);
+        if (_steamConnectionManager == null) Debug.LogError("CLIENT: Connection Manager = null");
         activeSteamSocketServer = false;
         activeSteamSocketConnection = true;
-        if (_steamConnectionManager == null) Debug.LogError("CLIENT: Connection Manager = null");
     }
 
-    public void LeaveSteamSocketServer() {
-        activeSteamSocketServer = false;
-        activeSteamSocketConnection = false;
+    public void LeaveSteamSocketServer()
+    {
         try
         {
-            _steamConnectionManager.Close();
-            _steamSocketManager.Close();
+            if (activeSteamSocketConnection)
+            {
+                Debug.Log("CLIENT: Attempting to leave server");
+                _steamConnectionManager.Close();
+                _steamConnectionManager = null;
+                activeSteamSocketConnection = false;
+            }
+            if (activeSteamSocketServer)
+            {
+                Debug.Log("SERVER: Attempting to close Socket");
+                _steamSocketManager.Close();
+                _steamSocketManager = null;
+                activeSteamSocketServer = false;
+            }
         }
         catch (Exception e)
         {
             Debug.LogError($"SERVER/CLIENT: Error closing connection! Exception {e}");
         }
+        //if (_steamSocketManager != null) Debug.LogError("SERVER: Socket Manager still active");
+        //if (_steamConnectionManager != null) Debug.LogError("SERVER: Connection Manager still active");
     }
 
     public void RelaySocketMessageReceived(IntPtr message, int size, uint connectionSendingMessageId) {

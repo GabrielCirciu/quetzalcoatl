@@ -18,7 +18,8 @@ public class SteamManager : MonoBehaviour {
     
     private void Awake()
     {
-        if ( instance == null ){
+        if ( instance == null )
+        {
             _firstInstance = true;
             DontDestroyOnLoad(gameObject);
             instance = this;
@@ -35,17 +36,31 @@ public class SteamManager : MonoBehaviour {
                 Application.Quit();
             }
         }
-        else if ( instance != this ) { Destroy(gameObject); }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void Update()
     {
         SteamClient.RunCallbacks();
-        try {
-            if ( activeSteamSocketServer ) { _steamSocketManager.Receive(); }
-            if ( activeSteamSocketConnection ) { _steamConnectionManager.Receive(); }
+        try
+        {
+            if (activeSteamSocketServer)
+            {
+                _steamSocketManager.Receive();
+            }
+
+            if (activeSteamSocketConnection)
+            {
+                _steamConnectionManager.Receive();
+            }
         }
-        catch { Debug.LogError("SERVER/CLIENT: Error receiving data"); }
+        catch (Exception e)
+        {
+            Debug.LogError($"SERVER/CLIENT: Error receiving data! Exception: {e}");
+        }
     }
 
     public void CreateSteamSocketServer()
@@ -100,9 +115,12 @@ public class SteamManager : MonoBehaviour {
         }
     }
 
-    public void RelaySocketMessageReceived(IntPtr message, int size, uint connectionSendingMessageId) {
-        try {
-            for (var i = 0; i < _steamSocketManager.Connected.Count; i++) {
+    public void RelaySocketMessageReceived(IntPtr message, int size, uint connectionSendingMessageId)
+    {
+        try
+        {
+            for (var i = 0; i < _steamSocketManager.Connected.Count; i++)
+            {
                 if (_steamSocketManager.Connected[i].Id != connectionSendingMessageId)
                 {
                     var success = _steamSocketManager.Connected[i].SendMessage(message, size);
@@ -110,10 +128,14 @@ public class SteamManager : MonoBehaviour {
                 }
             }
         }
-        catch { Debug.LogError("SERVER: Socket Message couldn't be relayed"); }
+        catch (Exception e)
+        {
+            Debug.LogError($"SERVER: Error relaying data! Exception: {e}");
+        }
     }
 
-    public bool SendMessageToSocketServer(byte[] messageToSend) {
+    public bool SendMessageToSocketServer(byte[] messageToSend)
+    {
         try {
             var sizeOfMessage = messageToSend.Length;
             var intPtrMessage = System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeOfMessage);
@@ -134,7 +156,8 @@ public class SteamManager : MonoBehaviour {
         }
     }
 
-    public void ProcessMessageFromSocketServer(IntPtr messageIntPtr, int dataBlockSize) {
+    public void ProcessMessageFromSocketServer(IntPtr messageIntPtr, int dataBlockSize)
+    {
         try
         {
             var dataArray = new byte[dataBlockSize];
@@ -146,14 +169,25 @@ public class SteamManager : MonoBehaviour {
         }
     }
 
-    private void OnDisable(){ if (_firstInstance) GameCleanup(); }
+    private void OnDisable()
+    {
+        if (_firstInstance) GameCleanup();
+    }
 
-    private void OnDestroy(){ if (_firstInstance) GameCleanup(); }
+    private void OnDestroy()
+    {
+        if (_firstInstance) GameCleanup();
+    }
 
-    private void OnApplicationQuit(){ if (_firstInstance) GameCleanup(); }
+    private void OnApplicationQuit()
+    {
+        if (_firstInstance) GameCleanup();
+    }
 
-    private void GameCleanup(){
-        if (!_appHasQuit) {
+    private void GameCleanup()
+    {
+        if (!_appHasQuit)
+        {
             _appHasQuit = true;
             SteamClient.Shutdown();
         }

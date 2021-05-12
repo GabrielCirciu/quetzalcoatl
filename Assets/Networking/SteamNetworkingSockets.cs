@@ -41,13 +41,13 @@ public class SteamConnectionManager : ConnectionManager
     {
         base.OnConnected(info);
         Debug.Log($"CLIENT: Connected to {info.Identity.SteamId.AccountId}");
-        SceneManager.LoadScene("TestingScene2");
+        SceneManager.LoadScene("CharacterAnimations");
     }
     public override void OnDisconnected(ConnectionInfo info)
     {
-        SceneManager.LoadScene("MenuScene");
         base.OnDisconnected(info);
-        Debug.Log($"CLIENT: Disconnected from {info.Address}");
+        Debug.Log($"CLIENT: Disconnected from {info.Identity.SteamId.AccountId.ToString()}");
+        SceneManager.LoadScene("MenuScene");
     }
     public override void OnMessage(IntPtr data, int size, long messageNum, long recvTime, int channel)
     {

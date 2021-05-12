@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayMenuManager : MonoBehaviour {
@@ -5,8 +6,13 @@ public class PlayMenuManager : MonoBehaviour {
     public GameObject characterSelectionPanel, playModePanel;
     public GameObject singlePlayerPanel, multiPlayerPanel, hostPanel, joinPanel;
 
-    public SteamManager steamManager;
-    
+    private SteamManager _steamManager;
+
+    private void Start()
+    {
+        _steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
+    }
+
     private void OnEnable() {
         characterSelectionPanel.SetActive(true);
         playModePanel.SetActive(false);
@@ -53,10 +59,10 @@ public class PlayMenuManager : MonoBehaviour {
     }
 
     public void OnStartServerHostButtonPressed() {
-        steamManager.CreateSteamSocketServer();
+        _steamManager.CreateSteamSocketServer();
     }
 
     public void OnJoinFriendButtonPressed() {
-        steamManager.JoinSteamSocketServer();
+        _steamManager.JoinSteamSocketServer();
     }
 }

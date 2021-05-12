@@ -26,7 +26,7 @@ public class SteamSocketManager : SocketManager {
 
 // Connection Manager for enabling all player connections to socket server
 public class SteamConnectionManager : ConnectionManager {
-    private WorldManager _worldManager;
+    //private WorldManager _worldManager;
     
     public override void OnConnecting(ConnectionInfo info) {
         base.OnConnecting(info);
@@ -35,14 +35,14 @@ public class SteamConnectionManager : ConnectionManager {
     public override void OnConnected(ConnectionInfo info) {
         base.OnConnected(info);
         Debug.Log($"CLIENT: Connected to {info.Identity.SteamId.AccountId}");
-        _worldManager = GameObject.Find("WorldManager").GetComponent<WorldManager>();
-        _worldManager.JoinMultiPlayerWorld();
+        //_worldManager = GameObject.Find("WorldManager").GetComponent<WorldManager>();
+        //_worldManager.JoinMultiPlayerWorld();
     }
     public override void OnDisconnected(ConnectionInfo info) {
         base.OnDisconnected(info);
         Debug.Log($"CLIENT: Disconnected from {info.Address}");
-        _worldManager = GameObject.Find("WorldManager").GetComponent<WorldManager>();
-        _worldManager.ReturnToMainMenu();
+        //_worldManager = GameObject.Find("WorldManager").GetComponent<WorldManager>();
+        //_worldManager.ReturnToMainMenu();
     }
     public override void OnMessage(IntPtr data, int size, long messageNum, long recvTime, int channel) {
         SteamManager.instance.ProcessMessageFromSocketServer(data, size);

@@ -6,13 +6,13 @@ public class SteamManager : MonoBehaviour {
     public static SteamManager instance;
     private const uint GameAppId = 480;
     private bool _appHasQuit;
-    private bool _firstInstance;
+    private bool _firstInstance;    
 
     private SteamId PlayerSteamId { get; set; }
     public SteamId FriendSteamId { get; set; }
 
-    public SteamSocketManager steamSocketManager;
-    public SteamConnectionManager steamConnectionManager;
+    private SteamSocketManager _steamSocketManager;
+    private SteamConnectionManager _steamConnectionManager;
     public bool activeSteamSocketServer;
     public bool activeSteamSocketConnection;
 
@@ -42,8 +42,8 @@ public class SteamManager : MonoBehaviour {
     private void Update() {
         SteamClient.RunCallbacks();
         try {
-            if ( activeSteamSocketServer ) { steamSocketManager.Receive(); }
-            if ( activeSteamSocketConnection ) { steamConnectionManager.Receive(); }
+            if ( activeSteamSocketServer ) { _steamSocketManager.Receive(); }
+            if ( activeSteamSocketConnection ) { _steamConnectionManager.Receive(); }
         }
         catch { Debug.LogError("SERVER/CLIENT: Error receiving data"); }
     }
@@ -54,20 +54,17 @@ public class SteamManager : MonoBehaviour {
 
     public void CreateSteamSocketServer() {
         Debug.Log("SERVER: Attempting to create socket");
-        if (steamSocketManager != null) Debug.LogError("SERVER: Socket Manager already exists");
-        steamSocketManager = SteamNetworkingSockets.CreateRelaySocket<SteamSocketManager>(0);
-        if (steamSocketManager == null) Debug.LogError("SERVER: Socket Manager = null");
-        if (steamConnectionManager != null) Debug.LogError("CLIENT: Connection Manager already exists");
-        steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(PlayerSteamId);
-        if (steamConnectionManager == null) Debug.LogError("SERVER: Connection Manager = null");
+        _steamSocketManager = SteamNetworkingSockets.CreateRelaySocket<SteamSocketManager>();
+        if (_steamSocketManager == null) Debug.LogError("SERVER: Socket Manager = null");
+        _steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(PlayerSteamId);
+        if (_steamConnectionManager == null) Debug.LogError("SERVER: Connection Manager = null");
         activeSteamSocketServer = true;
         activeSteamSocketConnection = true;
     }
 
     public void JoinSteamSocketServer() {
-        if (steamConnectionManager != null) Debug.LogError("CLIENT: Connection Manager already exists");
-        steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(FriendSteamId);
-        if (steamConnectionManager == null) Debug.LogError("CLIENT: Connection Manager = null");
+        _steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(FriendSteamId);
+        if (_steamConnectionManager == null) Debug.LogError("CLIENT: Connection Manager = null");
         activeSteamSocketServer = false;
         activeSteamSocketConnection = true;
     }
@@ -78,8 +75,8 @@ public class SteamManager : MonoBehaviour {
         activeSteamSocketServer = false;
         try
         {
-            steamConnectionManager.Close();
-            steamSocketManager.Close();
+            _steamConnectionManager.Close();
+            _steamSocketManager.Close();
         }
         catch (Exception e)
         {
@@ -89,10 +86,10 @@ public class SteamManager : MonoBehaviour {
 
     public void RelaySocketMessageReceived(IntPtr message, int size, uint connectionSendingMessageId) {
         try {
-            for (var i = 0; i < steamSocketManager.Connected.Count; i++) {
-                if (steamSocketManager.Connected[i].Id != connectionSendingMessageId)
+            for (var i = 0; i < _steamSocketManager.Connected.Count; i++) {
+                if (_steamSocketManager.Connected[i].Id != connectionSendingMessageId)
                 {
-                    var success = steamSocketManager.Connected[i].SendMessage(message, size);
+                    var success = _steamSocketManager.Connected[i].SendMessage(message, size);
                     if (success != Result.OK) Debug.LogError("SERVER: Socket Message couldn't be relayed");
                 }
             }
@@ -105,7 +102,7 @@ public class SteamManager : MonoBehaviour {
             var sizeOfMessage = messageToSend.Length;
             var intPtrMessage = System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeOfMessage);
             System.Runtime.InteropServices.Marshal.Copy(messageToSend, 0, intPtrMessage, sizeOfMessage);
-            var success = steamConnectionManager.Connection.SendMessage(intPtrMessage, sizeOfMessage);
+            var success = _steamConnectionManager.Connection.SendMessage(intPtrMessage, sizeOfMessage);
             if (success == Result.OK)
             {
                 // Free up memory at pointer

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class FriendListManager : MonoBehaviour
+public class ServerListManager : MonoBehaviour
 {
     private int _friendListLength;
     public GameObject friendListContentPanel, friendObj;
@@ -27,10 +27,10 @@ public class FriendListManager : MonoBehaviour
             }
             _friendListLength = 0;
         }
-        GetServerList();
-        //GetPlayingFriends();
-        //GetOnlineFriends();
-        //GetOfflineFriends();
+        //GetServerList();
+        GetPlayingFriends();
+        GetOnlineFriends();
+        GetOfflineFriends();
     }
 
     private static void GetServerList()

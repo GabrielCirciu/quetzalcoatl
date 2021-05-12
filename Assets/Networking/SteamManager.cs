@@ -69,8 +69,8 @@ public class SteamManager : MonoBehaviour {
 
     public void LeaveSteamSocketServer() {
         try {
-            steamSocketManager.Close();
             steamConnectionManager.Close();
+            steamSocketManager.Close();
             Debug.Log("Left the server");
         }
         catch { Debug.Log("Error closing socket server / connection manager"); }

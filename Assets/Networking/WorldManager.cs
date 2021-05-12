@@ -29,12 +29,7 @@ public class WorldManager : MonoBehaviour {
         const string messageIdentifier = "o";
         var messageTimeStamp = DateTime.Now.ToString("HH:mm");
         var messageName = SteamClient.Name;
-        var messageNameLength = messageName.Length;
-        var messageNameOverflow = 0;
-        if ( messageNameLength > 9 ) messageNameOverflow = 1;
-        const string joinedText = " has joined the world!";
-        var encodedMessage = messageIdentifier + messageNameOverflow + messageNameLength + messageTimeStamp +
-                             messageName + joinedText;
+        var encodedMessage = messageIdentifier + messageTimeStamp + messageName;
         var messageToByte = System.Text.Encoding.UTF8.GetBytes(encodedMessage);
         steamManager.SendMessageToSocketServer(messageToByte);
     }

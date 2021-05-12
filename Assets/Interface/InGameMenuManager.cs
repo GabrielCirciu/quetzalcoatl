@@ -6,13 +6,13 @@ public class InGameMenuManager : MonoBehaviour {
     public ChatManager chatManager;
     private CinemachineFreeLook _cinemachineFreeLook;
     private CameraControls _cameraControls;
-    private SteamManager _steamManager;
+    public SteamManager steamManager;
 
     private void Start() {
+        steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
         _cinemachineFreeLook = cinemachineCamera.GetComponent<CinemachineFreeLook>();
         _cameraControls = cinemachineCamera.GetComponent<CameraControls>();
         inGameMenuPanel.SetActive(false);
-        _steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
     }
 
     private void Update() {
@@ -44,7 +44,7 @@ public class InGameMenuManager : MonoBehaviour {
     }
 
     public void OnMainMenuButtonPressed() {
-        _steamManager.LeaveSteamSocketServer();
+        steamManager.LeaveSteamSocketServer();
     }
 
     public void OnExitButtonPressed() {

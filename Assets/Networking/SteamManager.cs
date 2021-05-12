@@ -11,8 +11,8 @@ public class SteamManager : MonoBehaviour {
     private SteamId PlayerSteamId { get; set; }
     public SteamId FriendSteamId { get; set; }
 
-    private SteamSocketManager _steamSocketManager;
-    private SteamConnectionManager _steamConnectionManager;
+    public SteamSocketManager steamSocketManager;
+    public SteamConnectionManager steamConnectionManager;
     public bool activeSteamSocketServer;
     public bool activeSteamSocketConnection;
 
@@ -42,8 +42,8 @@ public class SteamManager : MonoBehaviour {
     private void Update() {
         SteamClient.RunCallbacks();
         try {
-            if ( activeSteamSocketServer ) { _steamSocketManager.Receive(); }
-            if ( activeSteamSocketConnection ) { _steamConnectionManager.Receive(); }
+            if ( activeSteamSocketServer ) { steamSocketManager.Receive(); }
+            if ( activeSteamSocketConnection ) { steamConnectionManager.Receive(); }
         }
         catch { Debug.LogError("Error recieving data on socket/connection"); }
     }
@@ -53,24 +53,24 @@ public class SteamManager : MonoBehaviour {
     }
 
     public void CreateSteamSocketServer() {
-        _steamSocketManager = SteamNetworkingSockets.CreateRelaySocket<SteamSocketManager>();
-        _steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(PlayerSteamId);
+        steamSocketManager = SteamNetworkingSockets.CreateRelaySocket<SteamSocketManager>();
+        steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(PlayerSteamId);
         activeSteamSocketServer = true;
         activeSteamSocketConnection = true;
-        if (_steamConnectionManager != null) Debug.Log("Attempting to create a server");
+        if (steamConnectionManager != null) Debug.Log("Attempting to create a server");
     }
 
     public void JoinSteamSocketServer() {
-        _steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(FriendSteamId);
+        steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(FriendSteamId);
         activeSteamSocketServer = false;
         activeSteamSocketConnection = true;
-        if (_steamConnectionManager != null) Debug.Log("Attempting to join a server");
+        if (steamConnectionManager != null) Debug.Log("Attempting to join a server");
     }
 
     public void LeaveSteamSocketServer() {
         try {
-            _steamSocketManager.Close();
-            _steamConnectionManager.Close();
+            steamSocketManager.Close();
+            steamConnectionManager.Close();
             Debug.Log("Left the server");
         }
         catch { Debug.Log("Error closing socket server / connection manager"); }
@@ -80,10 +80,10 @@ public class SteamManager : MonoBehaviour {
 
     public void RelaySocketMessageReceived(IntPtr message, int size, uint connectionSendingMessageId) {
         try {
-            for (var i = 0; i < _steamSocketManager.Connected.Count; i++) {
-                if (_steamSocketManager.Connected[i].Id != connectionSendingMessageId)
+            for (var i = 0; i < steamSocketManager.Connected.Count; i++) {
+                if (steamSocketManager.Connected[i].Id != connectionSendingMessageId)
                 {
-                    var success = _steamSocketManager.Connected[i].SendMessage(message, size);
+                    var success = steamSocketManager.Connected[i].SendMessage(message, size);
                     if (success != Result.OK) Debug.Log("Socket Message could not be relayed");
                     else Debug.Log("Socket Message relayed from Server");
                 }
@@ -97,7 +97,7 @@ public class SteamManager : MonoBehaviour {
             var sizeOfMessage = messageToSend.Length;
             var intPtrMessage = System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeOfMessage);
             System.Runtime.InteropServices.Marshal.Copy(messageToSend, 0, intPtrMessage, sizeOfMessage);
-            var success = _steamConnectionManager.Connection.SendMessage(intPtrMessage, sizeOfMessage);
+            var success = steamConnectionManager.Connection.SendMessage(intPtrMessage, sizeOfMessage);
             if (success == Result.OK) {
                 System.Runtime.InteropServices.Marshal.FreeHGlobal(intPtrMessage); // Free up memory at pointer
                 Debug.Log("Data sent to server");

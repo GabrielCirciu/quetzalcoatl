@@ -27,9 +27,24 @@ public class FriendListManager : MonoBehaviour
             }
             _friendListLength = 0;
         }
-        GetPlayingFriends();
-        GetOnlineFriends();
-        GetOfflineFriends();
+        GetServerList();
+        //GetPlayingFriends();
+        //GetOnlineFriends();
+        //GetOfflineFriends();
+    }
+
+    private static void GetServerList()
+    {
+        Debug.Log("Getting server list");
+        var request = new Steamworks.ServerList.Internet();
+        Debug.Log("Getting server list");
+        request.RunQueryAsync(30);
+        Debug.Log("Running Async Query");
+        foreach (var serverInfo in request.Responsive)
+        {
+            Debug.Log(serverInfo.Name);
+        }
+        Debug.Log("Finished displaying servers");
     }
 
     private void GetPlayingFriends()

@@ -12,12 +12,30 @@ public class CurrentPlayerList : MonoBehaviour {
         public TMP_Text textText;
     }
 
+    private SteamManager _steamManager;
+
     private void Start() {
         AddSelfToCurrentPlayerList();
+        _steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
     }
 
-    private void Update() {
-        if ( Input.GetKeyDown(KeyCode.Tab) ) currentPlayerListCanvas.SetActive(!currentPlayerListCanvas.activeSelf);
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (!currentPlayerListCanvas.activeSelf)
+            {
+                currentPlayerListCanvas.SetActive(true);
+                UpdateCurrentPlayerList();
+            }
+            else currentPlayerListCanvas.SetActive(false);
+        }
+    }
+
+    private void UpdateCurrentPlayerList()
+    {
+        Debug.Log(_steamManager.steamSocketManager.Connected[0].Id.ToString());
+        // Get server player data and display them
     }
 
     private void AddSelfToCurrentPlayerList() {

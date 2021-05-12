@@ -1,5 +1,6 @@
 using Steamworks;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class SteamManager : MonoBehaviour {
@@ -15,6 +16,11 @@ public class SteamManager : MonoBehaviour {
     private SteamConnectionManager _steamConnectionManager;
     public bool activeSteamSocketServer;
     public bool activeSteamSocketConnection;
+    
+    private readonly List<Player> _playerlist = new List<Player>();
+    private class Player {
+        public string name;
+    }
     
     private void Awake()
     {
@@ -36,10 +42,7 @@ public class SteamManager : MonoBehaviour {
                 Application.Quit();
             }
         }
-        else if (instance != this)
-        {
-            Destroy(gameObject);
-        }
+        else if (instance != this) Destroy(gameObject);
     }
 
     private void Update()
@@ -47,58 +50,27 @@ public class SteamManager : MonoBehaviour {
         SteamClient.RunCallbacks();
         try
         {
-            if (activeSteamSocketServer)
-            {
-                _steamSocketManager.Receive();
-            }
-
-            if (activeSteamSocketConnection)
-            {
-                _steamConnectionManager.Receive();
-            }
+            if (activeSteamSocketServer) _steamSocketManager.Receive();
+            if (activeSteamSocketConnection) _steamConnectionManager.Receive();
         }
-        catch (Exception e)
-        {
-            Debug.LogError($"SERVER/CLIENT: Error receiving data! Exception: {e}");
-        }
+        catch (Exception e) { Debug.LogError($"SERVER/CLIENT: Error receiving data! Exception: {e}"); }
     }
 
     public void CreateSteamSocketServer()
     {
-        Debug.Log("SERVER: Attempting to create server");
         _steamSocketManager = SteamNetworkingSockets.CreateRelaySocket<SteamSocketManager>();
         _steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(PlayerSteamId);
-        if (_steamSocketManager != null)
-        {
-            activeSteamSocketServer = true;
-        }
-        else
-        {
-            Debug.LogError("SERVER: Socket Manager = null");
-        }
-
-        if (_steamConnectionManager != null)
-        {
-            activeSteamSocketConnection = true;
-        }
-        else
-        {
-            Debug.LogError("SERVER: Connection Manager = null");
-        }
+        if (_steamSocketManager != null) activeSteamSocketServer = true;
+            else Debug.LogError("SERVER: Socket Manager = null");
+        if (_steamConnectionManager != null) activeSteamSocketConnection = true;
+            else Debug.LogError("SERVER: Connection Manager = null");
     }
 
     public void JoinSteamSocketServer()
     {
-        Debug.Log("CLIENT: Attempting to join server");
         _steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(FriendSteamId);
-        if (_steamConnectionManager != null)
-        {
-            activeSteamSocketConnection = true;
-        }
-        else
-        {
-            Debug.LogError("CLIENT: Connection Manager = null");
-        }
+        if (_steamConnectionManager != null) activeSteamSocketConnection = true;
+            else Debug.LogError("CLIENT: Connection Manager = null");
     }
 
     public void LeaveSteamSocketServer()
@@ -128,15 +100,13 @@ public class SteamManager : MonoBehaviour {
                 }
             }
         }
-        catch (Exception e)
-        {
-            Debug.LogError($"SERVER: Error relaying data! Exception: {e}");
-        }
+        catch (Exception e) { Debug.LogError($"SERVER: Error relaying data! Exception: {e}"); }
     }
 
     public bool SendMessageToSocketServer(byte[] messageToSend)
     {
-        try {
+        try
+        {
             var sizeOfMessage = messageToSend.Length;
             var intPtrMessage = System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeOfMessage);
             System.Runtime.InteropServices.Marshal.Copy(messageToSend, 0, intPtrMessage, sizeOfMessage);
@@ -163,9 +133,25 @@ public class SteamManager : MonoBehaviour {
             var dataArray = new byte[dataBlockSize];
             System.Runtime.InteropServices.Marshal.Copy(messageIntPtr, dataArray, 0, dataBlockSize);
         }
-        catch (Exception e)
+        catch (Exception e) { Debug.LogError($"CLIENT: Error processing data! Exception: {e}"); }
+    }
+
+    public void UpdatePlayerList()
+    {
+        Debug.Log("SERVER: Running UpdatePlayerList");
+        if (_playerlist.Count > 0)
         {
-            Debug.LogError($"CLIENT: Error processing data! Exception: {e}");
+            Debug.Log("SERVER: Cleaning player list");
+            for (var i = 0; i < _steamSocketManager.Connected.Count; i++)
+            {
+                _playerlist.Remove(_playerlist[0]);
+            }
+        }
+        for (var i = 0; i < _steamSocketManager.Connected.Count; i++)
+        {
+            var newPlayer = new Player();
+            newPlayer.name = _steamSocketManager.Connected[i].DetailedStatus();
+            _playerlist.Add(newPlayer);
         }
     }
 

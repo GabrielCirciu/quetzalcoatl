@@ -6,8 +6,7 @@ public class PlayMenuManager : MonoBehaviour {
     public GameObject singlePlayerPanel, multiPlayerPanel, hostPanel, joinPanel;
 
     public SteamManager steamManager;
-    public WorldManager worldManager;
-
+    
     private void OnEnable() {
         characterSelectionPanel.SetActive(true);
         playModePanel.SetActive(false);
@@ -50,7 +49,7 @@ public class PlayMenuManager : MonoBehaviour {
     }
 
     public void OnStartSinglePlayerButtonPressed() {
-        worldManager.StartSinglePlayerWorld();
+        // Does nothing yet
     }
 
     public void OnStartServerHostButtonPressed() {

@@ -44,6 +44,7 @@ public class ChatManager : MonoBehaviour {
         var encodedMessage = messageIdentifier + messageTimeStamp + messageName;
         var messageToByte = Encoding.UTF8.GetBytes(encodedMessage);
         JoinedChatMessage(messageToByte);
+        steamManager.SendMessageToSocketServer(messageToByte);
     }
 
     private void Update(){

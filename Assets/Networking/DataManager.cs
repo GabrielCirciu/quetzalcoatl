@@ -7,7 +7,7 @@ public class DataManager : MonoBehaviour {
 
     private void Start() {
         steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
-        steamManager.ActivateDataManager();
+        //steamManager.ActivateDataManager();
     }
 
     public void ProcessRecievedData(byte[] dataArray)

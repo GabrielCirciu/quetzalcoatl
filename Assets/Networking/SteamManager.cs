@@ -15,10 +15,9 @@ public class SteamManager : MonoBehaviour {
     private SteamConnectionManager _steamConnectionManager;
     public bool activeSteamSocketServer;
     public bool activeSteamSocketConnection;
-
-    public DataManager dataManager;
-
-    private void Awake(){
+    
+    private void Awake()
+    {
         if ( instance == null ){
             _firstInstance = true;
             DontDestroyOnLoad(gameObject);
@@ -39,7 +38,8 @@ public class SteamManager : MonoBehaviour {
         else if ( instance != this ) { Destroy(gameObject); }
     }
 
-    private void Update() {
+    private void Update()
+    {
         SteamClient.RunCallbacks();
         try {
             if ( activeSteamSocketServer ) { _steamSocketManager.Receive(); }
@@ -48,39 +48,55 @@ public class SteamManager : MonoBehaviour {
         catch { Debug.LogError("SERVER/CLIENT: Error receiving data"); }
     }
 
-    public void ActivateDataManager() {
-        dataManager = GameObject.Find("DataManager").GetComponent<DataManager>();
-    }
-
-    public void CreateSteamSocketServer() {
-        Debug.Log("SERVER: Attempting to create socket");
+    public void CreateSteamSocketServer()
+    {
+        Debug.Log("SERVER: Attempting to create server");
         _steamSocketManager = SteamNetworkingSockets.CreateRelaySocket<SteamSocketManager>();
-        if (_steamSocketManager == null) Debug.LogError("SERVER: Socket Manager = null");
         _steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(PlayerSteamId);
-        if (_steamConnectionManager == null) Debug.LogError("SERVER: Connection Manager = null");
-        activeSteamSocketServer = true;
-        activeSteamSocketConnection = true;
+        if (_steamSocketManager != null)
+        {
+            activeSteamSocketServer = true;
+        }
+        else
+        {
+            Debug.LogError("SERVER: Socket Manager = null");
+        }
+
+        if (_steamConnectionManager != null)
+        {
+            activeSteamSocketConnection = true;
+        }
+        else
+        {
+            Debug.LogError("SERVER: Connection Manager = null");
+        }
     }
 
-    public void JoinSteamSocketServer() {
+    public void JoinSteamSocketServer()
+    {
+        Debug.Log("CLIENT: Attempting to join server");
         _steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(FriendSteamId);
-        if (_steamConnectionManager == null) Debug.LogError("CLIENT: Connection Manager = null");
-        activeSteamSocketServer = false;
-        activeSteamSocketConnection = true;
+        if (_steamConnectionManager != null)
+        {
+            activeSteamSocketConnection = true;
+        }
+        else
+        {
+            Debug.LogError("CLIENT: Connection Manager = null");
+        }
     }
 
     public void LeaveSteamSocketServer()
     {
-        activeSteamSocketConnection = false;
-        activeSteamSocketServer = false;
-        try
+        if (activeSteamSocketConnection)
         {
+            activeSteamSocketConnection = false;
             _steamConnectionManager.Close();
-            _steamSocketManager.Close();
         }
-        catch (Exception e)
+        if (activeSteamSocketServer)
         {
-            Debug.LogError($"SERVER/CLIENT: Error closing connection! Exception {e}");
+            activeSteamSocketServer = false;
+            _steamSocketManager.Close();
         }
     }
 
@@ -109,11 +125,8 @@ public class SteamManager : MonoBehaviour {
                 System.Runtime.InteropServices.Marshal.FreeHGlobal(intPtrMessage);
                 return true;
             }
-            else
-            {
-                Debug.LogError($"CLIENT: Result returned unsuccessful");
-                return false;
-            }
+            Debug.LogError($"CLIENT: Result returned unsuccessful");
+            return false;
         }
         catch (Exception e) {
             Debug.LogError($"CLIENT: Error sending data! Exception: {e}");
@@ -126,7 +139,6 @@ public class SteamManager : MonoBehaviour {
         {
             var dataArray = new byte[dataBlockSize];
             System.Runtime.InteropServices.Marshal.Copy(messageIntPtr, dataArray, 0, dataBlockSize);
-            dataManager.ProcessRecievedData(dataArray);
         }
         catch (Exception e)
         {

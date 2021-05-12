@@ -45,7 +45,7 @@ public class SteamManager : MonoBehaviour {
             if ( activeSteamSocketServer ) { _steamSocketManager.Receive(); }
             if ( activeSteamSocketConnection ) { _steamConnectionManager.Receive(); }
         }
-        catch { Debug.LogError("Error recieving data on socket/connection"); }
+        catch { Debug.LogError("SERVER/CLIENT: Error receiving data"); }
     }
 
     public void ActivateDataManager() {
@@ -57,24 +57,28 @@ public class SteamManager : MonoBehaviour {
         _steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(PlayerSteamId);
         activeSteamSocketServer = true;
         activeSteamSocketConnection = true;
-        if (_steamConnectionManager == null) Debug.Log("SERVER: Connection Manager = null");
+        if (_steamConnectionManager == null) Debug.LogError("SERVER: Connection Manager = null");
     }
 
     public void JoinSteamSocketServer() {
         _steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(FriendSteamId);
         activeSteamSocketServer = false;
         activeSteamSocketConnection = true;
-        if (_steamConnectionManager == null) Debug.Log("CLIENT: Connection Manager = null");
+        if (_steamConnectionManager == null) Debug.LogError("CLIENT: Connection Manager = null");
     }
 
     public void LeaveSteamSocketServer() {
         activeSteamSocketServer = false;
         activeSteamSocketConnection = false;
-        try {
+        try
+        {
             _steamConnectionManager.Close();
             _steamSocketManager.Close();
         }
-        catch { Debug.Log("Error closing socket server / connection manager"); }
+        catch (Exception e)
+        {
+            Debug.LogError($"SERVER/CLIENT: Error closing connection! Exception {e}");
+        }
     }
 
     public void RelaySocketMessageReceived(IntPtr message, int size, uint connectionSendingMessageId) {
@@ -83,12 +87,11 @@ public class SteamManager : MonoBehaviour {
                 if (_steamSocketManager.Connected[i].Id != connectionSendingMessageId)
                 {
                     var success = _steamSocketManager.Connected[i].SendMessage(message, size);
-                    if (success != Result.OK) Debug.Log("Socket Message could not be relayed");
-                    else Debug.Log("Socket Message relayed from Server");
+                    if (success != Result.OK) Debug.LogError("SERVER: Socket Message couldn't be relayed");
                 }
             }
         }
-        catch { Debug.Log("Unable to relay socket server message"); }
+        catch { Debug.LogError("SERVER: Socket Message couldn't be relayed"); }
     }
 
     public bool SendMessageToSocketServer(byte[] messageToSend) {
@@ -97,25 +100,35 @@ public class SteamManager : MonoBehaviour {
             var intPtrMessage = System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeOfMessage);
             System.Runtime.InteropServices.Marshal.Copy(messageToSend, 0, intPtrMessage, sizeOfMessage);
             var success = _steamConnectionManager.Connection.SendMessage(intPtrMessage, sizeOfMessage);
-            if (success == Result.OK) {
-                System.Runtime.InteropServices.Marshal.FreeHGlobal(intPtrMessage); // Free up memory at pointer
+            if (success == Result.OK)
+            {
+                // Free up memory at pointer
+                System.Runtime.InteropServices.Marshal.FreeHGlobal(intPtrMessage);
                 return true;
             }
-            else return false;
+            else
+            {
+                Debug.LogError($"CLIENT: Result returned unsuccessful");
+                return false;
+            }
         }
         catch (Exception e) {
-            Debug.Log($"Unable to send message to socket server. Exception: {e}");
+            Debug.LogError($"CLIENT: Error sending data! Exception: {e}");
             return false;
         }
     }
 
     public void ProcessMessageFromSocketServer(IntPtr messageIntPtr, int dataBlockSize) {
-        try {
+        try
+        {
             var dataArray = new byte[dataBlockSize];
             System.Runtime.InteropServices.Marshal.Copy(messageIntPtr, dataArray, 0, dataBlockSize);
             dataManager.ProcessRecievedData(dataArray);
         }
-        catch { Debug.Log("Unable to process message from socket server"); }
+        catch (Exception e)
+        {
+            Debug.LogError($"CLIENT: Error processing data! Exception: {e}");
+        }
     }
 
     private void OnDisable(){ if (_firstInstance) GameCleanup(); }

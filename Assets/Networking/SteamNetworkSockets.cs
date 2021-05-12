@@ -8,18 +8,19 @@ public class SteamSocketManager : SocketManager {
 
     public override void OnConnecting(Connection connection, ConnectionInfo info) {
 		base.OnConnecting(connection, info);
-        Debug.Log("Connecting to server as host");
+        Debug.Log("SERVER: A client is CONNECTING");
 	}
     public override void OnConnected(Connection connection, ConnectionInfo info) {
 		base.OnConnected(connection, info);
-        Debug.Log("Connected to server as host");
+        Debug.Log("SERVER: A client has CONNECTED");
 	}
 	public override void OnDisconnected(Connection connection, ConnectionInfo info) {
 		base.OnDisconnected(connection, info);
-        Debug.Log("Server has been shut down");
+        Debug.Log("SERVER: A client has DISCONNECTED");
 	}
 	public override void OnMessage(Connection connection, NetIdentity identity, IntPtr data, int size, long messageNum, long recvTime, int channel) {
 		SteamManager.instance.RelaySocketMessageReceived(data, size, connection.Id);
+        Debug.Log("SERVER: Data recieved. Relaying...");
 	}
 }
 
@@ -29,21 +30,22 @@ public class SteamConnectionManager : ConnectionManager {
     
     public override void OnConnecting(ConnectionInfo info) {
         base.OnConnecting(info);
-        Debug.Log($"Connecting to server as client");
+        Debug.Log($"CLIENT: Connecting");
     }
     public override void OnConnected(ConnectionInfo info) {
         base.OnConnected(info);
-        Debug.Log("Connected to server as client");
+        Debug.Log("CLIENT: Connected");
         _worldManager = GameObject.Find("WorldManager").GetComponent<WorldManager>();
         _worldManager.JoinMultiPlayerWorld();
     }
     public override void OnDisconnected(ConnectionInfo info) {
         base.OnDisconnected(info);
-        Debug.Log("Disconnected from server");
+        Debug.Log("CLIENT: Disconnected");
         _worldManager = GameObject.Find("WorldManager").GetComponent<WorldManager>();
         _worldManager.ReturnToMainMenu();
     }
     public override void OnMessage(IntPtr data, int size, long messageNum, long recvTime, int channel) {
         SteamManager.instance.ProcessMessageFromSocketServer(data, size);
+        Debug.Log("CLIENT: Data recieved. Processing...");
     }
 }

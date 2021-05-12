@@ -41,11 +41,7 @@ public class ChatManager : MonoBehaviour {
         const string messageIdentifier = "o";
         var messageTimeStamp = DateTime.Now.ToString("HH:mm");
         var messageName = SteamClient.Name;
-        var messageNameLength = messageName.Length;
-        var messageNameOverflow = 0;
-        if (messageNameLength > 9) messageNameOverflow = 1;
-        const string joinedText = " has joined the world!";
-        var encodedMessage = messageIdentifier+messageNameOverflow+messageNameLength.ToString()+messageTimeStamp+messageName+joinedText;
+        var encodedMessage = messageIdentifier + messageTimeStamp + messageName;
         var messageToByte = Encoding.UTF8.GetBytes(encodedMessage);
         JoinedChatMessage(messageToByte);
     }
@@ -103,7 +99,7 @@ public class ChatManager : MonoBehaviour {
         var messageNameLength = messageName.Length;
         var messageNameOverflow = 0;
         if (messageNameLength > 9) messageNameOverflow = 1;
-        var encodedMessage = messageIdentifier+messageNameOverflow+messageNameLength.ToString()+messageTimeStamp+messageName+chatText;
+        var encodedMessage = messageIdentifier+messageNameOverflow+messageNameLength+messageTimeStamp+messageName+chatText;
         var messageToByte = Encoding.UTF8.GetBytes(encodedMessage);
         steamManager.SendMessageToSocketServer(messageToByte);
         ReceiveChatMessage(messageToByte);
@@ -155,16 +151,12 @@ public class ChatManager : MonoBehaviour {
             _messageList.Remove(_messageList[0]);
         }
         var newMessage = new Message();
-        newMessage.overflow = int.Parse(Encoding.UTF8.GetString(eMessage, 1, 1));
-        newMessage.nameLength = int.Parse(Encoding.UTF8.GetString(eMessage, 2, 1+newMessage.overflow));
-        newMessage.timestamp = Encoding.UTF8.GetString(eMessage, 3+newMessage.overflow, 5);
-        newMessage.name = Encoding.UTF8.GetString(eMessage, 8+newMessage.overflow, newMessage.nameLength);
-        var textStartPos = 8 + newMessage.overflow + newMessage.nameLength;
-        newMessage.text = Encoding.UTF8.GetString(eMessage, textStartPos, eMessage.Length-textStartPos);
+        newMessage.timestamp = Encoding.UTF8.GetString(eMessage, 1, 5);
+        newMessage.name = Encoding.UTF8.GetString(eMessage, 6, eMessage.Length-6);
         var newTextObject = Instantiate(textObject, contentPanel.transform);
         newMessage.textText = newTextObject.GetComponent<TMP_Text>();
         newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <b><color=#FFFF00>"+
-                                    newMessage.name+newMessage.text+"</color></b>";
+                                    newMessage.name+" has joined the world!</color></b>";
         _messageList.Add(newMessage);
 
         if ( !chatCanvas.activeSelf ) StartCoroutine( ChatFadeOut() );

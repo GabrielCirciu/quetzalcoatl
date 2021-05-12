@@ -54,8 +54,10 @@ public class SteamManager : MonoBehaviour {
 
     public void CreateSteamSocketServer() {
         Debug.Log("SERVER: Attempting to create socket");
-        steamSocketManager = SteamNetworkingSockets.CreateRelaySocket<SteamSocketManager>();
+        if (steamSocketManager != null) Debug.LogError("SERVER: Socket Manager already exists");
+        steamSocketManager = SteamNetworkingSockets.CreateRelaySocket<SteamSocketManager>(0);
         if (steamSocketManager == null) Debug.LogError("SERVER: Socket Manager = null");
+        if (steamConnectionManager != null) Debug.LogError("CLIENT: Connection Manager already exists");
         steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(PlayerSteamId);
         if (steamConnectionManager == null) Debug.LogError("SERVER: Connection Manager = null");
         activeSteamSocketServer = true;

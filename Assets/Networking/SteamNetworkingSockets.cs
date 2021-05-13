@@ -17,17 +17,23 @@ public class SteamSocketManager : SocketManager
 		base.OnConnected(connection, info);
         Debug.Log($"SERVER: Client has connected.");
         GameObject.Find("SteamManager").GetComponent<SteamManager>().UpdatePlayerList();
-	}
+    }
 	public override void OnDisconnected(Connection connection, ConnectionInfo info)
     {
 		base.OnDisconnected(connection, info);
         Debug.Log($"SERVER: Client has disconnected");
-	}
+        GameObject.Find("SteamManager").GetComponent<SteamManager>().UpdatePlayerList();
+    }
 	public override void OnMessage(Connection connection, NetIdentity identity, IntPtr data, int size, long messageNum, long recvTime, int channel)
     {
-		SteamManager.instance.RelaySocketMessageReceived(data, size, connection.Id);
-        Debug.Log("SERVER: Data recieved. Relaying...");
-	}
+        SteamManager.instance.RelaySocketMessageReceived(data, size, connection.Id);
+        var dataArray = new byte[1];
+        dataArray[0] = System.Runtime.InteropServices.Marshal.ReadByte(data);
+        var dataString = System.Text.Encoding.UTF8.GetString(dataArray);
+        Debug.Log("SERVER: Data recieved " + $"( ID: {connection.Id}, SteamID: {identity.SteamId.ToString()}, " +
+                  $"Size: {size}, MessageNum: {messageNum}, RecvTime: {recvTime}, Channel: {channel}, " +
+                  $"DataIntPtr: {data}, DataArray[0]: {dataArray[0]}, DataString: {dataString}. Relaying...");
+    }
 }
 
 // Connection Manager for enabling all player connections to socket server

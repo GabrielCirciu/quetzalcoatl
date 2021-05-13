@@ -121,8 +121,8 @@ public class ChatManager : MonoBehaviour {
         newMessage.text = Encoding.UTF8.GetString(eMessage, textStartPos, eMessage.Length-textStartPos);
         var newTextObject = Instantiate(textObject, contentPanel.transform);
         newMessage.textText = newTextObject.GetComponent<TMP_Text>();
-        newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <b>[</b> <color=#00FFFF>"+
-                                    newMessage.name+"</color> <b>]</b>: "+newMessage.text;
+        newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <color=#00FFFF>"+
+                                    newMessage.name+"</color>: "+newMessage.text;
         _messageList.Add(newMessage);
 
         if ( !chatCanvas.activeSelf ) StartCoroutine( ChatFadeOut() );
@@ -156,8 +156,8 @@ public class ChatManager : MonoBehaviour {
         newMessage.name = Encoding.UTF8.GetString(eMessage, 6, eMessage.Length-6);
         var newTextObject = Instantiate(textObject, contentPanel.transform);
         newMessage.textText = newTextObject.GetComponent<TMP_Text>();
-        newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <b><color=#FFFF00>"+
-                                    newMessage.name+" has joined the world!</color></b>";
+        newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <color=#FFFF00>"+
+                                    newMessage.name+" has joined the world!</color>";
         _messageList.Add(newMessage);
 
         if ( !chatCanvas.activeSelf ) StartCoroutine( ChatFadeOut() );

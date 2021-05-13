@@ -19,7 +19,7 @@ public class SteamManager : MonoBehaviour {
     
     private readonly List<Player> _playerlist = new List<Player>();
     private class Player {
-        public string name;
+        public uint ID;
     }
     
     private void Awake()
@@ -142,16 +142,18 @@ public class SteamManager : MonoBehaviour {
         if (_playerlist.Count > 0)
         {
             Debug.Log("SERVER: Cleaning player list");
-            for (var i = 0; i < _steamSocketManager.Connected.Count; i++)
+            for (var i = 0; i <= _steamSocketManager.Connected.Count; i++)
             {
+                Debug.Log($"SERVER: Removing ID: {_playerlist[i].ID}");
                 _playerlist.Remove(_playerlist[0]);
             }
         }
         for (var i = 0; i < _steamSocketManager.Connected.Count; i++)
         {
             var newPlayer = new Player();
-            newPlayer.name = _steamSocketManager.Connected[i].DetailedStatus();
+            newPlayer.ID = _steamSocketManager.Connected[i].Id;
             _playerlist.Add(newPlayer);
+            Debug.Log($"SERVER: Adding new ID: {newPlayer.ID}");
         }
     }
 

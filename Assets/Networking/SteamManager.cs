@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SteamManager : MonoBehaviour {
     public static SteamManager instance;
+    private ServerDataManager _serverDataManager;
     private ClientDataManager _clientDataManager;
     private const uint GameAppId = 480;
     private bool _appHasQuit;
@@ -16,6 +17,8 @@ public class SteamManager : MonoBehaviour {
     private SteamConnectionManager _steamConnectionManager;
     public bool activeSteamSocketServer;
     public bool activeSteamSocketConnection;
+    
+    private readonly byte[] _dataTypeCheck = new byte[1];
 
     private void Awake()
     {
@@ -40,6 +43,11 @@ public class SteamManager : MonoBehaviour {
         else if (instance != this) Destroy(gameObject);
     }
 
+    private void Start()
+    {
+        _serverDataManager = ServerDataManager.instance;
+    }
+
     private void Update()
     {
         SteamClient.RunCallbacks();
@@ -48,17 +56,22 @@ public class SteamManager : MonoBehaviour {
             if (activeSteamSocketServer) _steamSocketManager.Receive();
             if (activeSteamSocketConnection) _steamConnectionManager.Receive();
         }
-        catch (Exception e) { Debug.LogError($"SERVER/CLIENT: Error receiving data! Exception: {e}"); }
+        catch (Exception e) { Debug.LogError($"ERROR: Error receiving data! Exception: {e}"); }
     }
 
     public void CreateSteamSocketServer()
     {
+        Debug.Log("SERVER: Creating Steam Socket Server");
+        
         _steamSocketManager = SteamNetworkingSockets.CreateRelaySocket<SteamSocketManager>();
         _steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(PlayerSteamId);
+        
         if (_steamSocketManager != null) activeSteamSocketServer = true;
             else Debug.LogError("SERVER: Socket Manager = null");
         if (_steamConnectionManager != null) activeSteamSocketConnection = true;
             else Debug.LogError("SERVER: Connection Manager = null");
+        
+        _serverDataManager.ClearPlayerDatabase();
     }
 
     public void JoinSteamSocketServer()
@@ -82,16 +95,20 @@ public class SteamManager : MonoBehaviour {
         }
     }
 
-    public void RelaySocketMessageReceived(IntPtr message, int size, uint connectionSendingMessageId)
+    public void RelaySocketMessageReceived(IntPtr dataPtr, int size, uint connectionID)
     {
+        // Checks the first byte, if 33 ("!"), it has to save on server, otherwise just relay
+        _dataTypeCheck[0] = System.Runtime.InteropServices.Marshal.ReadByte(dataPtr);
+        if (_dataTypeCheck[0] == 33) _serverDataManager.ProcessRecievedData(dataPtr, size, connectionID);
+
         try
         {
             for (var i = 0; i < _steamSocketManager.Connected.Count; i++)
             {
-                if (_steamSocketManager.Connected[i].Id != connectionSendingMessageId)
+                if (_steamSocketManager.Connected[i].Id != connectionID)
                 {
-                    var success = _steamSocketManager.Connected[i].SendMessage(message, size);
-                    if (success != Result.OK) Debug.LogError("SERVER: Socket Message couldn't be relayed");
+                    var success = _steamSocketManager.Connected[i].SendMessage(dataPtr, size);
+                    if (success != Result.OK) Debug.LogError("SERVER: Socket Message sending result not OK");
                 }
             }
         }

@@ -28,14 +28,13 @@ public class ClientDataManager : MonoBehaviour
         var messageName = SteamClient.Name;
         var encodedMessage = messageIdentifier + messageName;
         var messageToByte = Encoding.UTF8.GetBytes(encodedMessage);
-        _steamManager.SendMessageToSocketServer(messageToByte);
         _chatManager.ReceiveJoinedMessage(messageToByte);
+        _steamManager.SendMessageToSocketServer(messageToByte);
     }
 
     public void ProcessRecievedData(byte[] dataArray)
     {
         // Checks second byte of the data array
-        Debug.Log("CLIENT: Processing recieved data");
         switch ( dataArray[1] )
         {
             // CHAT MESSAGE: "n" (110 in UTF8-Hex): Receive chat message

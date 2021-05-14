@@ -1,5 +1,5 @@
-using Steamworks;
 using System;
+using Steamworks;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +9,8 @@ using Cinemachine;
 
 public class ChatManager : MonoBehaviour {
     
-    public SteamManager steamManager;
+    public static ChatManager instance;
+    private SteamManager _steamManager;
     private CinemachineFreeLook _cameraFreeLook;
     private CameraControls _cameraControls;
     private CharacterLocomotion _characterLocomotion;
@@ -17,34 +18,29 @@ public class ChatManager : MonoBehaviour {
     public GameObject cinemachineCamera, chatCanvas, characterObj, scrollViewObj;
     public GameObject contentPanel, chatInputFieldObject, textObject;
     private CanvasGroup _canvasGroup;
-    private int _maxMessages;
+    private const int MAXMessages = 10;
     public bool isChatWindowOpen;
     private readonly List<Message> _messageList = new List<Message>();
-    private class Message {
-        public int nameLength, overflow;
+    private class Message
+    {
+        public int nameLength;
         public string timestamp, name, text;
         public TMP_Text textText;
     }
 
-    private void Start(){
-        steamManager = SteamManager.instance;
+    private void Awake()
+    {
+        instance = this;
+    }
+
+    private void Start()
+    {
+        _steamManager = SteamManager.instance;
         _cameraFreeLook = cinemachineCamera.GetComponent<CinemachineFreeLook>();
         _canvasGroup = scrollViewObj.GetComponent<CanvasGroup>();
         _cameraControls = cinemachineCamera.GetComponent<CameraControls>();
         _characterLocomotion = characterObj.GetComponent<CharacterLocomotion>();
-        _maxMessages = 10;
         isChatWindowOpen = false;
-        SelfJoinMessage();
-    }
-
-    private void SelfJoinMessage() {
-        const string messageIdentifier = "o";
-        var messageTimeStamp = DateTime.Now.ToString("HH:mm");
-        var messageName = SteamClient.Name;
-        var encodedMessage = messageIdentifier + messageTimeStamp + messageName;
-        var messageToByte = Encoding.UTF8.GetBytes(encodedMessage);
-        JoinedChatMessage(messageToByte);
-        steamManager.SendMessageToSocketServer(messageToByte);
     }
 
     private void Update(){
@@ -92,42 +88,7 @@ public class ChatManager : MonoBehaviour {
         _cameraControls.enabled = true;
         _characterLocomotion.enabled = true;
     }
-
-    private void SendChatMessage(string chatText) {
-        const string messageIdentifier = "n";
-        var messageTimeStamp = DateTime.Now.ToString("HH:mm");
-        var messageName = SteamClient.Name;
-        var messageNameLength = messageName.Length;
-        var messageNameOverflow = 0;
-        if (messageNameLength > 9) messageNameOverflow = 1;
-        var encodedMessage = messageIdentifier+messageNameOverflow+messageNameLength+messageTimeStamp+messageName+chatText;
-        var messageToByte = Encoding.UTF8.GetBytes(encodedMessage);
-        steamManager.SendMessageToSocketServer(messageToByte);
-        ReceiveChatMessage(messageToByte);
-    }
-
-    public void ReceiveChatMessage(byte[] eMessage) {
-        if ( _messageList.Count >= _maxMessages ) {
-            Destroy(_messageList[0].textText.gameObject);
-            _messageList.Remove(_messageList[0]);
-        }
-
-        var newMessage = new Message();
-        newMessage.overflow = int.Parse(Encoding.UTF8.GetString(eMessage, 1, 1));
-        newMessage.nameLength = int.Parse(Encoding.UTF8.GetString(eMessage, 2, 1+newMessage.overflow));
-        newMessage.timestamp = Encoding.UTF8.GetString(eMessage, 3+newMessage.overflow, 5);
-        newMessage.name = Encoding.UTF8.GetString(eMessage, 8+newMessage.overflow, newMessage.nameLength);
-        var textStartPos = 8 + newMessage.overflow + newMessage.nameLength;
-        newMessage.text = Encoding.UTF8.GetString(eMessage, textStartPos, eMessage.Length-textStartPos);
-        var newTextObject = Instantiate(textObject, contentPanel.transform);
-        newMessage.textText = newTextObject.GetComponent<TMP_Text>();
-        newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <color=#00FFFF>"+
-                                    newMessage.name+"</color>: "+newMessage.text;
-        _messageList.Add(newMessage);
-
-        if ( !chatCanvas.activeSelf ) StartCoroutine( ChatFadeOut() );
-    }
-
+    
     private IEnumerator ChatFadeOut() {
         chatCanvas.SetActive(true);
         chatInputFieldObject.SetActive(false);
@@ -146,18 +107,59 @@ public class ChatManager : MonoBehaviour {
         yield return null;
     }
 
-    public void JoinedChatMessage(byte[] eMessage) {
-        if ( _messageList.Count >= _maxMessages ) {
+    private void RemoveOldChat()
+    {
+        if ( _messageList.Count >= MAXMessages )
+        {
             Destroy(_messageList[0].textText.gameObject);
             _messageList.Remove(_messageList[0]);
         }
+    }
+    
+    private void SendChatMessage(string chatText)
+    {
+        // # - Do not save, n - Chat message
+        const string messageIdentifier = "#n";
+        var messageName = SteamClient.Name;
+        var messageNameLength = Convert.ToByte(messageName.Length);
+        var encodedMessage = messageIdentifier+messageNameLength+messageName+chatText;
+        var messageToByte = Encoding.UTF8.GetBytes(encodedMessage);
+        _steamManager.SendMessageToSocketServer(messageToByte);
+        ReceiveChatMessage(messageToByte);
+    }
+
+    public void ReceiveChatMessage(byte[] eMessage)
+    {
+        RemoveOldChat();
+        
         var newMessage = new Message();
-        newMessage.timestamp = Encoding.UTF8.GetString(eMessage, 1, 5);
-        newMessage.name = Encoding.UTF8.GetString(eMessage, 6, eMessage.Length-6);
+        newMessage.timestamp = DateTime.Now.ToString("HH:m");
+        newMessage.nameLength = int.Parse(Encoding.UTF8.GetString(eMessage, 2, 1));
+        newMessage.name = Encoding.UTF8.GetString(eMessage, 3, newMessage.nameLength);
+        var textStartPos = 3 + newMessage.nameLength;
+        newMessage.text = Encoding.UTF8.GetString(eMessage, textStartPos, eMessage.Length-textStartPos);
+        var newTextObject = Instantiate(textObject, contentPanel.transform);
+        newMessage.textText = newTextObject.GetComponent<TMP_Text>();
+        newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <color=#00FFFF>"+
+                                    newMessage.name+"</color>: "+newMessage.text;
+        
+        _messageList.Add(newMessage);
+
+        if ( !chatCanvas.activeSelf ) StartCoroutine( ChatFadeOut() );
+    }
+    
+    public void ReceiveJoinedMessage(byte[] eMessage)
+    {
+        RemoveOldChat();
+        
+        var newMessage = new Message();
+        newMessage.timestamp = DateTime.Now.ToString("HH:m");
+        newMessage.name = Encoding.UTF8.GetString(eMessage, 2, eMessage.Length-2);
         var newTextObject = Instantiate(textObject, contentPanel.transform);
         newMessage.textText = newTextObject.GetComponent<TMP_Text>();
         newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <color=#FFFF00>"+
                                     newMessage.name+" has joined the world!</color>";
+        
         _messageList.Add(newMessage);
 
         if ( !chatCanvas.activeSelf ) StartCoroutine( ChatFadeOut() );

@@ -1,6 +1,5 @@
 using Steamworks;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SteamManager : MonoBehaviour {
@@ -16,12 +15,7 @@ public class SteamManager : MonoBehaviour {
     private SteamConnectionManager _steamConnectionManager;
     public bool activeSteamSocketServer;
     public bool activeSteamSocketConnection;
-    
-    private readonly List<Player> _playerlist = new List<Player>();
-    private class Player {
-        public uint ID;
-    }
-    
+
     private void Awake()
     {
         if ( instance == null )
@@ -134,27 +128,6 @@ public class SteamManager : MonoBehaviour {
             System.Runtime.InteropServices.Marshal.Copy(messageIntPtr, dataArray, 0, dataBlockSize);
         }
         catch (Exception e) { Debug.LogError($"CLIENT: Error processing data! Exception: {e}"); }
-    }
-
-    public void UpdatePlayerList()
-    {
-        Debug.Log("SERVER: Running UpdatePlayerList");
-        if (_playerlist.Count > 0)
-        {
-            Debug.Log("SERVER: Cleaning player list");
-            for (var i = 0; i <= _steamSocketManager.Connected.Count; i++)
-            {
-                Debug.Log($"SERVER: Removing ID: {_playerlist[i].ID}");
-                _playerlist.Remove(_playerlist[0]);
-            }
-        }
-        for (var i = 0; i < _steamSocketManager.Connected.Count; i++)
-        {
-            var newPlayer = new Player();
-            newPlayer.ID = _steamSocketManager.Connected[i].Id;
-            _playerlist.Add(newPlayer);
-            Debug.Log($"SERVER: Adding new ID: {newPlayer.ID}");
-        }
     }
 
     private void OnDisable()

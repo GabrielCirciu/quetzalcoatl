@@ -122,8 +122,8 @@ public class ChatManager : MonoBehaviour {
         const string messageIdentifier = "#n";
         var messageName = SteamClient.Name;
         var messageNameLength = (char)messageName.Length;
-        var encodedMessage = messageIdentifier+messageNameLength+messageName+chatText;
-        var messageToByte = Encoding.UTF8.GetBytes(encodedMessage);
+        var messageString = messageIdentifier+messageNameLength+messageName+chatText;
+        var messageToByte = Encoding.UTF8.GetBytes(messageString);
         _steamManager.SendMessageToSocketServer(messageToByte);
         ReceiveChatMessage(messageToByte);
     }
@@ -148,13 +148,14 @@ public class ChatManager : MonoBehaviour {
         if ( !chatCanvas.activeSelf ) StartCoroutine( ChatFadeOut() );
     }
     
-    public void ReceiveJoinedMessage(byte[] eMessage)
+    public void ReceiveJoinedMessage(byte[] dataArray)
     {
         RemoveOldChat();
         
         var newMessage = new Message();
         newMessage.timestamp = DateTime.Now.ToString("HH:m");
-        newMessage.name = Encoding.UTF8.GetString(eMessage, 2, eMessage.Length-2);
+        var startingPos = 3 + dataArray[2];
+        newMessage.name = Encoding.UTF8.GetString(dataArray, startingPos, dataArray.Length-startingPos);
         var newTextObject = Instantiate(textObject, contentPanel.transform);
         newMessage.textText = newTextObject.GetComponent<TMP_Text>();
         newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <color=#FFFF00>"+

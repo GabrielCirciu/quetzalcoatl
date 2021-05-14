@@ -2,16 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Steamworks;
 using System.Text;
-using Steamworks.Data;
-using Connection = UnityEditor.MemoryProfiler.Connection;
 
 public class ClientDataManager : MonoBehaviour
 {
     public static ClientDataManager instance;
     private ChatManager _chatManager;
     private SteamManager _steamManager;
-    private ConnectionInfo _connectionInfo;
-    
+
     private Dictionary<uint, Player> Players = new Dictionary<uint, Player>();
     private class Player
     {
@@ -37,11 +34,11 @@ public class ClientDataManager : MonoBehaviour
     {
         // ASCII: ! - Save on server, o - Join Message
         const string messageIdentifier = "!o";
-        //var connectionID = _connectionInfo.Identity;
-        //Debug.Log($"ID: {connectionID}");
+        var messageID = SteamClient.SteamId.ToString();
+        var idLength = (char) messageID.Length;
         var messageName = SteamClient.Name;
-        var encodedMessage = messageIdentifier + messageName;
-        var messageToByte = Encoding.UTF8.GetBytes(encodedMessage);
+        var messageString = messageIdentifier + idLength + messageID + messageName;
+        var messageToByte = Encoding.UTF8.GetBytes(messageString);
         _chatManager.ReceiveJoinedMessage(messageToByte);
         _steamManager.SendMessageToSocketServer(messageToByte);
     }

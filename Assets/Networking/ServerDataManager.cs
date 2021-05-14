@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
-using Steamworks;
 
 public class ServerDataManager : MonoBehaviour
 {
@@ -12,10 +11,9 @@ public class ServerDataManager : MonoBehaviour
     private Dictionary<uint, Player> Players = new Dictionary<uint, Player>();
     private class Player
     {
-        public uint connectionID;
-        public string name;
+        public string id, name;
     }
-    private string _playerName;
+    private string _playerID, _playerName;
 
     private void Awake()
     {
@@ -35,7 +33,7 @@ public class ServerDataManager : MonoBehaviour
 
     public void ProcessRecievedData(IntPtr dataPtr, int size, uint connectionID)
     {
-        Debug.Log("SERVER: Processing save data...");
+        Debug.Log("SERVER: Processing new saveable data...");
         // Checks second byte of the data array
         _dataTypeCheck[0] = System.Runtime.InteropServices.Marshal.ReadByte(dataPtr, 1);
         switch ( _dataTypeCheck[0] )
@@ -53,11 +51,12 @@ public class ServerDataManager : MonoBehaviour
         
         var dataArray = new byte[size];
         System.Runtime.InteropServices.Marshal.Copy(dataPtr, dataArray, 0, size);
-        
-        _playerName = Encoding.UTF8.GetString(dataArray, 2, dataArray.Length-2);
+        var pIDSize = dataArray[2];
+        _playerID = Encoding.UTF8.GetString(dataArray, 3, pIDSize);
+        _playerName = Encoding.UTF8.GetString(dataArray, 3+pIDSize, dataArray.Length-3-pIDSize);
         var newPlayer = new Player
         {
-            connectionID = connectionID,
+            id = _playerID,
             name = _playerName
         };
         Players.Add(connectionID, newPlayer);
@@ -69,17 +68,14 @@ public class ServerDataManager : MonoBehaviour
     {
         Debug.Log($"SERVER: Removing player [ {Players[connectionID].name} ] from database...");
         Players.Remove(connectionID);
-        Debug.Log("SERVER: New player list:");
-        foreach (var player in Players)
-            Debug.Log($"Player [ ID: {Players[player.Key].connectionID}, Name: {Players[player.Key].name} ]");
+
+        UpdateClientDatabse();
     }
-
-
-
+    
     private void UpdateClientDatabse()
     {
         Debug.Log("SERVER: New player list:");
         foreach (var player in Players)
-            Debug.Log($"Player [ ID: {Players[player.Key].connectionID}, Name: {Players[player.Key].name} ]");
+            Debug.Log($"Player [ ID: {Players[player.Key].id}, Name: {Players[player.Key].name} ]");
     }
 }

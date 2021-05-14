@@ -1,12 +1,24 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Steamworks;
 using System.Text;
+using Steamworks.Data;
+using Connection = UnityEditor.MemoryProfiler.Connection;
 
 public class ClientDataManager : MonoBehaviour
 {
     public static ClientDataManager instance;
     private ChatManager _chatManager;
     private SteamManager _steamManager;
+    private ConnectionInfo _connectionInfo;
+    
+    private Dictionary<uint, Player> Players = new Dictionary<uint, Player>();
+    private class Player
+    {
+        public uint connectionID;
+        public string name;
+    }
+    private string _playerName;
 
     private void Awake()
     {
@@ -25,6 +37,8 @@ public class ClientDataManager : MonoBehaviour
     {
         // ASCII: ! - Save on server, o - Join Message
         const string messageIdentifier = "!o";
+        //var connectionID = _connectionInfo.Identity;
+        //Debug.Log($"ID: {connectionID}");
         var messageName = SteamClient.Name;
         var encodedMessage = messageIdentifier + messageName;
         var messageToByte = Encoding.UTF8.GetBytes(encodedMessage);
@@ -45,7 +59,21 @@ public class ClientDataManager : MonoBehaviour
             // CHAT MESSAGE: "o" (111 in UTF8-Hex): Receive joined message
             case 111:
                 _chatManager.ReceiveJoinedMessage(dataArray);
+                //AddToPlayerDatabase(dataArray);
                 break;
         }
     }
+    
+    /*private void AddToPlayerDatabase(byte[] dataArray)
+    {
+        Debug.Log("CLIENT: Adding a new player to the database...");
+
+        _playerName = Encoding.UTF8.GetString(dataArray, 2, dataArray.Length-2);
+        var newPlayer = new Player
+        {
+            connectionID = connectionID,
+            name = _playerName
+        };
+        Players.Add(connectionID, newPlayer);
+    }*/
 }

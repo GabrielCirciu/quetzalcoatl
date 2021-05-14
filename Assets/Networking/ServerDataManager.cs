@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using Steamworks;
 
 public class ServerDataManager : MonoBehaviour
 {
     public static ServerDataManager instance;
+    private SteamSocketManager _steamSocketManager;
+    private readonly byte[] _dataTypeCheck = new byte[1];
     private Dictionary<uint, Player> Players = new Dictionary<uint, Player>();
     private class Player
     {
@@ -23,34 +26,34 @@ public class ServerDataManager : MonoBehaviour
         }
         else if (instance != this) Destroy(gameObject);
     }
+    
+    public void ClearPlayerDatabase()
+    {
+        Debug.Log("SERVER: Clearing Player Database (Dictionary)...");
+        Players.Clear();
+    }
 
     public void ProcessRecievedData(IntPtr dataPtr, int size, uint connectionID)
     {
-        Debug.Log("SERVER: Processing save data");
-        var dataArray = new byte[size];
-        System.Runtime.InteropServices.Marshal.Copy(dataPtr, dataArray, 0, size);
-        
+        Debug.Log("SERVER: Processing save data...");
         // Checks second byte of the data array
-        switch ( dataArray[1] )
+        _dataTypeCheck[0] = System.Runtime.InteropServices.Marshal.ReadByte(dataPtr, 1);
+        switch ( _dataTypeCheck[0] )
         {
             // BYTE: "o" (111 in UTF8-Hex / ASCII): Player joined message
             case 111:
-                AddToPlayerData(dataArray, connectionID);
+                AddToPlayerDatabase(dataPtr, size, connectionID);
                 break;
         }
     }
-
-    public void RemoveFromPlayerDatabase(uint connectionID)
-    {
-        Debug.Log($"SERVER: Removing player [ {Players[connectionID].name} ] from database...");
-        Players.Remove(connectionID);
-        foreach (var player in Players)
-            Debug.Log($"Players [ ID: {Players[player.Key].connectionID}, Name: {Players[player.Key].name} ]");
-    }
-
-    private void AddToPlayerData(byte[] dataArray, uint connectionID)
+    
+    private void AddToPlayerDatabase(IntPtr dataPtr, int size, uint connectionID)
     {
         Debug.Log("SERVER: Adding a new player to the database...");
+        
+        var dataArray = new byte[size];
+        System.Runtime.InteropServices.Marshal.Copy(dataPtr, dataArray, 0, size);
+        
         _playerName = Encoding.UTF8.GetString(dataArray, 2, dataArray.Length-2);
         var newPlayer = new Player
         {
@@ -58,13 +61,25 @@ public class ServerDataManager : MonoBehaviour
             name = _playerName
         };
         Players.Add(connectionID, newPlayer);
+
+        UpdateClientDatabse();
+    }
+
+    public void RemoveFromPlayerDatabase(uint connectionID)
+    {
+        Debug.Log($"SERVER: Removing player [ {Players[connectionID].name} ] from database...");
+        Players.Remove(connectionID);
+        Debug.Log("SERVER: New player list:");
         foreach (var player in Players)
             Debug.Log($"Player [ ID: {Players[player.Key].connectionID}, Name: {Players[player.Key].name} ]");
     }
 
-    public void ClearPlayerDatabase()
+
+
+    private void UpdateClientDatabse()
     {
-        Debug.Log("Clearing Player Database (Dictionary)...");
-        Players.Clear();
+        Debug.Log("SERVER: New player list:");
+        foreach (var player in Players)
+            Debug.Log($"Player [ ID: {Players[player.Key].connectionID}, Name: {Players[player.Key].name} ]");
     }
 }

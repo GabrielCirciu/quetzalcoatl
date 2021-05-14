@@ -24,6 +24,8 @@ public class SteamSocketManager : SocketManager
     }
     public override void OnMessage(Connection connection, NetIdentity identity, IntPtr data, int size, long messageNum, long recvTime, int channel)
     {
+        SteamManager.instance.RelaySocketMessageReceived(data, size, connection.Id);
+        
         // Outputs extensive information about the data that it recieved, to Debug Log
         var dataBytes = new byte[size];
         System.Runtime.InteropServices.Marshal.Copy(data, dataBytes, 0, size);
@@ -31,8 +33,6 @@ public class SteamSocketManager : SocketManager
         Debug.Log("SERVER: Data recieved " + $"( ConnectionID: {connection.Id}, SteamID: {identity.SteamId}, " +
                   $"Size: {size}, MessageNum: {messageNum}, RecvTime: {recvTime}, Channel: {channel}, " +
                   $"DataIntPtr: {data}, DataString: {dataString}. Relaying...");
-        
-        SteamManager.instance.RelaySocketMessageReceived(data, size, connection.Id);
     }
 }
 

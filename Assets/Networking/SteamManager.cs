@@ -100,19 +100,24 @@ public class SteamManager : MonoBehaviour {
         // Checks the first byte, if 33 ("!"), it has to save on server, otherwise just relay
         _dataTypeCheck[0] = System.Runtime.InteropServices.Marshal.ReadByte(dataPtr);
         if (_dataTypeCheck[0] == 33) _serverDataManager.ProcessRecievedData(dataPtr, size, connectionID);
-
-        try
+        else
         {
-            for (var i = 0; i < _steamSocketManager.Connected.Count; i++)
+            try
             {
-                if (_steamSocketManager.Connected[i].Id != connectionID)
+                for (var i = 0; i < _steamSocketManager.Connected.Count; i++)
                 {
-                    var success = _steamSocketManager.Connected[i].SendMessage(dataPtr, size);
-                    if (success != Result.OK) Debug.LogError("SERVER: Socket Message sending result not OK");
+                    if (_steamSocketManager.Connected[i].Id != connectionID)
+                    {
+                        var success = _steamSocketManager.Connected[i].SendMessage(dataPtr, size);
+                        if (success != Result.OK) Debug.LogError("SERVER: Socket Message sending result not OK");
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                Debug.LogError($"SERVER: Error relaying data! Exception: {e}");
+            }
         }
-        catch (Exception e) { Debug.LogError($"SERVER: Error relaying data! Exception: {e}"); }
     }
 
     public bool SendMessageToSocketServer(byte[] messageToSend)

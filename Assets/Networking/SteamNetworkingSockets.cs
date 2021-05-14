@@ -64,7 +64,7 @@ public class SteamConnectionManager : ConnectionManager
     }
     public override void OnMessage(IntPtr data, int size, long messageNum, long recvTime, int channel)
     {
-        SteamManager.instance.ProcessMessageFromSocketServer(data, size);
         Debug.Log("CLIENT: Data recieved. Processing...");
+        SteamManager.instance.ProcessMessageFromSocketServer(data, size);
     }
 }

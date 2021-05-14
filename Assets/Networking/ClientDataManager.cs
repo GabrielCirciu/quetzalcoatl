@@ -1,11 +1,10 @@
-using System;
 using UnityEngine;
 using Steamworks;
 using System.Text;
 
 public class ClientDataManager : MonoBehaviour
 {
-    private ClientDataManager instance;
+    public static ClientDataManager instance;
     private ChatManager _chatManager;
     private SteamManager _steamManager;
 
@@ -18,6 +17,7 @@ public class ClientDataManager : MonoBehaviour
     {
         _steamManager = SteamManager.instance;
         _chatManager = ChatManager.instance;
+        _steamManager.EnableClientDataManager();
         OnJoinedServer();
     }
     
@@ -41,11 +41,6 @@ public class ClientDataManager : MonoBehaviour
             // CHAT MESSAGE: "n" (110 in UTF8-Hex): Send chat message
             case 110:
                 _chatManager.ReceiveChatMessage(dataArray);
-                break;
-            
-            // PLAYER JOINED: "o" (111 in UTF8-Hex): Send player joined chat message
-            case 111:
-                _chatManager.ReceiveJoinedMessage(dataArray);
                 break;
         }
     }

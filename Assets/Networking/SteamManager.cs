@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SteamManager : MonoBehaviour {
     public static SteamManager instance;
+    private ClientDataManager _clientDataManager;
     private const uint GameAppId = 480;
     private bool _appHasQuit;
     private bool _firstInstance;    
@@ -119,17 +120,23 @@ public class SteamManager : MonoBehaviour {
             return false;
         }
     }
-
+    
     public void ProcessMessageFromSocketServer(IntPtr messageIntPtr, int dataBlockSize)
     {
         try
         {
             var dataArray = new byte[dataBlockSize];
             System.Runtime.InteropServices.Marshal.Copy(messageIntPtr, dataArray, 0, dataBlockSize);
+            _clientDataManager.ProcessRecievedData(dataArray);
         }
         catch (Exception e) { Debug.LogError($"CLIENT: Error processing data! Exception: {e}"); }
     }
 
+    public void EnableClientDataManager()
+    {
+        _clientDataManager = ClientDataManager.instance;
+    }
+    
     private void OnDisable()
     {
         if (_firstInstance) GameCleanup();

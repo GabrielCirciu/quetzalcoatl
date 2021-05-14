@@ -121,7 +121,7 @@ public class ChatManager : MonoBehaviour {
         // # - Do not save, n - Chat message
         const string messageIdentifier = "#n";
         var messageName = SteamClient.Name;
-        var messageNameLength = Convert.ToByte(messageName.Length);
+        var messageNameLength = (char)messageName.Length;
         var encodedMessage = messageIdentifier+messageNameLength+messageName+chatText;
         var messageToByte = Encoding.UTF8.GetBytes(encodedMessage);
         _steamManager.SendMessageToSocketServer(messageToByte);
@@ -134,7 +134,7 @@ public class ChatManager : MonoBehaviour {
         
         var newMessage = new Message();
         newMessage.timestamp = DateTime.Now.ToString("HH:m");
-        newMessage.nameLength = int.Parse(Encoding.UTF8.GetString(eMessage, 2, 1));
+        newMessage.nameLength = eMessage[2];
         newMessage.name = Encoding.UTF8.GetString(eMessage, 3, newMessage.nameLength);
         var textStartPos = 3 + newMessage.nameLength;
         newMessage.text = Encoding.UTF8.GetString(eMessage, textStartPos, eMessage.Length-textStartPos);

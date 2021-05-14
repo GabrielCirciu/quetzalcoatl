@@ -38,9 +38,14 @@ public class ClientDataManager : MonoBehaviour
         Debug.Log("CLIENT: Processing recieved data");
         switch ( dataArray[1] )
         {
-            // CHAT MESSAGE: "n" (110 in UTF8-Hex): Send chat message
+            // CHAT MESSAGE: "n" (110 in UTF8-Hex): Receive chat message
             case 110:
                 _chatManager.ReceiveChatMessage(dataArray);
+                break;
+            
+            // CHAT MESSAGE: "o" (111 in UTF8-Hex): Receive joined message
+            case 111:
+                _chatManager.ReceiveJoinedMessage(dataArray);
                 break;
         }
     }

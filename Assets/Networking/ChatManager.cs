@@ -27,7 +27,7 @@ public class ChatManager : MonoBehaviour {
     }
 
     private void Start(){
-        steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
+        steamManager = SteamManager.instance;
         _cameraFreeLook = cinemachineCamera.GetComponent<CinemachineFreeLook>();
         _canvasGroup = scrollViewObj.GetComponent<CanvasGroup>();
         _cameraControls = cinemachineCamera.GetComponent<CameraControls>();

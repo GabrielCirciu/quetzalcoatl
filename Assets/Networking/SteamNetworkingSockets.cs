@@ -16,13 +16,11 @@ public class SteamSocketManager : SocketManager
     {
 		base.OnConnected(connection, info);
         Debug.Log($"SERVER: Client has connected.");
-        GameObject.Find("SteamManager").GetComponent<SteamManager>().UpdatePlayerList();
     }
 	public override void OnDisconnected(Connection connection, ConnectionInfo info)
     {
 		base.OnDisconnected(connection, info);
         Debug.Log($"SERVER: Client has disconnected");
-        GameObject.Find("SteamManager").GetComponent<SteamManager>().UpdatePlayerList();
     }
 	public override void OnMessage(Connection connection, NetIdentity identity, IntPtr data, int size, long messageNum, long recvTime, int channel)
     {

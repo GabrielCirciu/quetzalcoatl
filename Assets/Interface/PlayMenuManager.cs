@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class PlayMenuManager : MonoBehaviour {
@@ -10,7 +9,7 @@ public class PlayMenuManager : MonoBehaviour {
 
     private void Start()
     {
-        _steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
+        _steamManager = SteamManager.instance;
     }
 
     private void OnEnable() {

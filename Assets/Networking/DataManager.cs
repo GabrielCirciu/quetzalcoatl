@@ -1,14 +1,8 @@
 using UnityEngine;
 
 public class DataManager : MonoBehaviour {
-
-    public SteamManager steamManager;
+    
     public ChatManager chatManager;
-
-    private void Start() {
-        steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
-        //steamManager.ActivateDataManager();
-    }
 
     public void ProcessRecievedData(byte[] dataArray)
     {

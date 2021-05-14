@@ -9,7 +9,7 @@ public class InGameMenuManager : MonoBehaviour {
     public SteamManager steamManager;
 
     private void Start() {
-        steamManager = GameObject.Find("SteamManager").GetComponent<SteamManager>();
+        steamManager = SteamManager.instance;
         _cinemachineFreeLook = cinemachineCamera.GetComponent<CinemachineFreeLook>();
         _cameraControls = cinemachineCamera.GetComponent<CameraControls>();
         inGameMenuPanel.SetActive(false);

@@ -20,7 +20,7 @@ public class SteamSocketManager : SocketManager
     {
 		base.OnDisconnected(connection, info);
         Debug.Log($"SERVER: Client has disconnected");
-        ServerDataManager.instance.RemoveFromPlayerDatabase(connection.Id);
+        SteamManager.instance.RemoveFromPlayerDatabase(connection.Id);
     }
     public override void OnMessage(Connection connection, NetIdentity identity, IntPtr data, int size, long messageNum, long recvTime, int channel)
     {

@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using Steamworks;
 
 public class ServerDataManager : MonoBehaviour
 {
     public static ServerDataManager instance;
     private SteamSocketManager _steamSocketManager;
     private readonly byte[] _dataTypeCheck = new byte[1];
-    private Dictionary<uint, Player> Players = new Dictionary<uint, Player>();
-    private class Player
+    public Dictionary<uint, Player> Players = new Dictionary<uint, Player>();
+    public class Player
     {
         public ulong id;
         public string name;
@@ -71,29 +70,7 @@ public class ServerDataManager : MonoBehaviour
         SendDataToNewPlayer(connectionID);
     }
 
-    public void RemoveFromPlayerDatabase(uint connectionID)
-    {
-        Debug.Log($"SERVER: Removing player [ ID: {Players[connectionID].id}, Name: {Players[connectionID].name} ] from database...");
-        try
-        {
-            var messageString = "!p" + Players[connectionID].id;
-            var messageToByte = Encoding.UTF8.GetBytes(messageString);
-            var messageSize = messageString.Length;
-            var messaegIntPtr = System.Runtime.InteropServices.Marshal.AllocHGlobal(messageSize);
-            System.Runtime.InteropServices.Marshal.Copy(messageToByte, 0, messaegIntPtr, messageSize);
-            for (var i = 0; i < _steamSocketManager.Connected.Count; i++)
-            {
-                var success = _steamSocketManager.Connected[i].SendMessage(messaegIntPtr, messageSize);
-                if (success != Result.OK) Debug.LogError("SERVER: Socket Message sending result not OK", this);
-            }
-        }
-        catch (Exception e) { Debug.LogError($"SERVER: Error sending data! Exception: {e}", this); }
-
-        Players.Remove(connectionID);
-        ShowNewPlayerList();
-    }
-    
-    private void ShowNewPlayerList()
+    public void ShowNewPlayerList()
     {
         var playerListString = Players.Aggregate("SERVER: New Player list:\n",
             (current, player) =>

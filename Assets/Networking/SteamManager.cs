@@ -1,6 +1,7 @@
 using Steamworks;
 using System;
 using UnityEngine;
+using System.Text;
 
 public class SteamManager : MonoBehaviour {
     public static SteamManager instance;
@@ -145,6 +146,29 @@ public class SteamManager : MonoBehaviour {
             _clientDataManager.ProcessRecievedData(dataArray);
         }
         catch (Exception e) { Debug.LogError($"CLIENT: Error processing data! Exception: {e}"); }
+    }
+    
+    public void RemoveFromPlayerDatabase(uint connectionID)
+    {
+        Debug.Log($"SERVER: Removing player [ ID: {_serverDataManager.Players[connectionID].id}, Name: {_serverDataManager.Players[connectionID].name} ] from database...");
+        try
+        {
+            var messageString = "!p" + _serverDataManager.Players[connectionID].id;
+            var messageToByte = Encoding.UTF8.GetBytes(messageString);
+            var messageSize = messageString.Length;
+            var messaegIntPtr = System.Runtime.InteropServices.Marshal.AllocHGlobal(messageSize);
+            System.Runtime.InteropServices.Marshal.Copy(messageToByte, 0, messaegIntPtr, messageSize);
+            for (var i = 0; i < _steamSocketManager.Connected.Count; i++)
+            {
+                var success = _steamSocketManager.Connected[i].SendMessage(messaegIntPtr, messageSize);
+                if (success != Result.OK) Debug.LogError("SERVER: Socket Message sending result not OK", this);
+                else System.Runtime.InteropServices.Marshal.FreeHGlobal(messaegIntPtr);
+            }
+        }
+        catch (Exception e) { Debug.LogError($"SERVER: Error sending data! Exception: {e}", this); }
+
+        _serverDataManager.Players.Remove(connectionID);
+        _serverDataManager.ShowNewPlayerList();
     }
 
     public void EnableClientDataManager()

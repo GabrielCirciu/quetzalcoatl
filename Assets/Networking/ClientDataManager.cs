@@ -51,22 +51,31 @@ public class ClientDataManager : MonoBehaviour
                 _chatManager.ReceiveChatMessage(dataArray);
                 break;
             
-            // JOIN: "o" (in ASCII): Receive join message
+            // JOIN: "o" (in ASCII): Receive join chat message and add new player to database
             case 111:
                 _chatManager.ReceiveJoinMessage(dataArray);
                 AddToPlayerDatabase(dataArray);
                 break;
             
-            // LEAVE: "p" (in ASCII): Receive leave message
+            // LEAVE: "p" (in ASCII): Receive leave data, remove specific player
             case 112:
                 RemoveFromPlayerDatabase(dataArray);
                 break;
+            
+            // LEAVE: "q" (in ASCII): Get all saved data from server
+            case 113:
+                ReceiveOnJoinData();
+                break;
         }
+    }
+
+    private void ReceiveOnJoinData()
+    {
+        // Nothing yet
     }
     
     private void AddToPlayerDatabase(byte[] dataArray)
     {
-        Debug.Log("CLIENT: Adding a new player to the database...");
         _playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 2, 17));
         _playerName = Encoding.UTF8.GetString(dataArray, 19, dataArray.Length-19);
         var newPlayer = new Player
@@ -75,12 +84,13 @@ public class ClientDataManager : MonoBehaviour
             name = _playerName
         };
         _players.Add(_playerID, newPlayer);
+        Debug.Log($"CLIENT: Added new player [ ID: {_players[_playerID].id}, Name: {_players[_playerID].name} ] to database...");
     }
 
     private void RemoveFromPlayerDatabase(byte[] dataArray)
     {
-        Debug.Log("CLIENT: Removing a player from the database...");
         _playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 2, 17));
+        Debug.Log($"CLIENT: Removing [ ID: {_players[_playerID].id}, Name: {_players[_playerID].name} ] from the database...");
         _players.Remove(_playerID);
     }
 }

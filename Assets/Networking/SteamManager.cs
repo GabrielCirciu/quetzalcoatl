@@ -107,10 +107,10 @@ public class SteamManager : MonoBehaviour {
             {
                 if (_steamSocketManager.Connected[i].Id == connectionID) continue;
                 var success = _steamSocketManager.Connected[i].SendMessage(dataPtr, size);
-                if (success != Result.OK) Debug.LogError("SERVER: Socket Message sending result not OK");
+                if (success != Result.OK) Debug.LogError("SERVER: Socket Message sending result not OK", this);
             }
         }
-        catch (Exception e) { Debug.LogError($"SERVER: Error relaying data! Exception: {e}"); }
+        catch (Exception e) { Debug.LogError($"SERVER: Error relaying data! Exception: {e}", this); }
     }
 
     public bool SendMessageToSocketServer(byte[] messageToSend)

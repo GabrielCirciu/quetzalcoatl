@@ -21,7 +21,7 @@ public class CharacterLocomotion : MonoBehaviour {
         _camTransform = Camera.main.transform;
         _turnSmoothTime = 0.1f;
         _gravity = -30f;
-        _groundDistance = 0.1f;
+        _groundDistance = 0.3f;
         _jumpHeight = 2f;
     }
 

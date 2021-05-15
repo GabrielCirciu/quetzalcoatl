@@ -14,25 +14,25 @@ public class SteamSocketManager : SocketManager
     public override void OnConnected(Connection connection, ConnectionInfo info)
     {
 		base.OnConnected(connection, info);
-        Debug.Log($"SERVER: Client has connected.");
+        Debug.Log($"SERVER: Client [ ID: {connection.Id} ] has connected.");
     }
 	public override void OnDisconnected(Connection connection, ConnectionInfo info)
     {
 		base.OnDisconnected(connection, info);
-        Debug.Log($"SERVER: Client has disconnected");
+        Debug.Log($"SERVER: Client [ ID: {connection.Id} ] has disconnected");
         SteamManager.instance.RemoveFromPlayerDatabase(connection.Id);
     }
     public override void OnMessage(Connection connection, NetIdentity identity, IntPtr data, int size, long messageNum, long recvTime, int channel)
     {
-        SteamManager.instance.RelaySocketMessageReceived(data, size, connection.Id);
-        
         // Outputs extensive information about the data that it recieved, to Debug Log
         var dataBytes = new byte[size];
         System.Runtime.InteropServices.Marshal.Copy(data, dataBytes, 0, size);
         var dataString = System.Text.Encoding.UTF8.GetString(dataBytes);
-        Debug.Log($"SERVER: Data recieved...\nConnectionID: {connection.Id}; SteamID: {identity.SteamId},\n" +
+        Debug.Log($"SERVER: Data recieved, and relaying...\nConnectionID: {connection.Id}; SteamID: {identity.SteamId},\n" +
                   $"Size: {size}, MessageNum: {messageNum}, RecvTime: {recvTime}, Channel: {channel},\n" +
-                  $"DataIntPtr: {data}, DataString: {dataString}.\nRelaying...\n");
+                  $"DataIntPtr: {data}, DataString: {dataString}.\n");
+        
+        SteamManager.instance.RelaySocketMessageReceived(data, size, connection.Id);
     }
 }
 

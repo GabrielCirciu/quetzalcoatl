@@ -38,7 +38,8 @@ public class ServerDataManager : MonoBehaviour
     public void ProcessRecievedData(IntPtr dataPtr, int size, uint connectionID)
     {
         Debug.Log("SERVER: Processing new saveable data...");
-        // Checks second byte of the data array
+        
+        // Checks second byte of the data array, which is the TYPE of message
         _dataTypeCheck[0] = System.Runtime.InteropServices.Marshal.ReadByte(dataPtr, 1);
         switch ( _dataTypeCheck[0] )
         {
@@ -53,8 +54,6 @@ public class ServerDataManager : MonoBehaviour
     
     private void AddToPlayerDatabase(IntPtr dataPtr, int size, uint connectionID)
     {
-        Debug.Log("SERVER: Adding a new player to the database...");
-        
         var dataArray = new byte[size];
         System.Runtime.InteropServices.Marshal.Copy(dataPtr, dataArray, 0, size);
         _playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 2, 17));
@@ -64,6 +63,8 @@ public class ServerDataManager : MonoBehaviour
             id = _playerID,
             name = _playerName
         };
+        
+        Debug.Log($"SERVER: Adding new player [ ID: {_playerID}, Name: {_playerName} ] to the database...");
         Players.Add(connectionID, newPlayer);
         
         ShowNewPlayerList();

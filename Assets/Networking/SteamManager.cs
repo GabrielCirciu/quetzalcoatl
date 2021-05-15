@@ -153,6 +153,7 @@ public class SteamManager : MonoBehaviour {
         Debug.Log($"SERVER: Removing player [ ID: {_serverDataManager.Players[connectionID].id}, Name: {_serverDataManager.Players[connectionID].name} ] from database...");
         try
         {
+            // LEAVE: "p" as player left identifier sent to clients, "!" as it's a saveable data
             var messageString = "!p" + _serverDataManager.Players[connectionID].id;
             var messageToByte = Encoding.UTF8.GetBytes(messageString);
             var messageSize = messageString.Length;

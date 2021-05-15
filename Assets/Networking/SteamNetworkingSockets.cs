@@ -30,9 +30,9 @@ public class SteamSocketManager : SocketManager
         var dataBytes = new byte[size];
         System.Runtime.InteropServices.Marshal.Copy(data, dataBytes, 0, size);
         var dataString = System.Text.Encoding.UTF8.GetString(dataBytes);
-        Debug.Log("SERVER: Data recieved " + $"( ConnectionID: {connection.Id}, SteamID: {identity.SteamId}, " +
-                  $"Size: {size}, MessageNum: {messageNum}, RecvTime: {recvTime}, Channel: {channel}, " +
-                  $"DataIntPtr: {data}, DataString: {dataString}. Relaying...");
+        Debug.Log($"SERVER: Data recieved...\nConnectionID: {connection.Id}; SteamID: {identity.SteamId},\n" +
+                  $"Size: {size}, MessageNum: {messageNum}, RecvTime: {recvTime}, Channel: {channel},\n" +
+                  $"DataIntPtr: {data}, DataString: {dataString}.\nRelaying...\n");
     }
 }
 

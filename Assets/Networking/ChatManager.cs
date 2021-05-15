@@ -28,10 +28,7 @@ public class ChatManager : MonoBehaviour {
         public TMP_Text textText;
     }
 
-    private void Awake()
-    {
-        instance = this;
-    }
+    private void Awake() => instance = this;
 
     private void Start()
     {
@@ -148,14 +145,13 @@ public class ChatManager : MonoBehaviour {
         if ( !chatCanvas.activeSelf ) StartCoroutine( ChatFadeOut() );
     }
     
-    public void ReceiveJoinedMessage(byte[] dataArray)
+    public void ReceiveJoinMessage(byte[] dataArray)
     {
         RemoveOldChat();
         
         var newMessage = new Message();
         newMessage.timestamp = DateTime.Now.ToString("HH:m");
-        var startingPos = 3 + dataArray[2];
-        newMessage.name = Encoding.UTF8.GetString(dataArray, startingPos, dataArray.Length-startingPos);
+        newMessage.name = Encoding.UTF8.GetString(dataArray, 19, dataArray.Length-19);
         var newTextObject = Instantiate(textObject, contentPanel.transform);
         newMessage.textText = newTextObject.GetComponent<TMP_Text>();
         newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <color=#FFFF00>"+

@@ -11,9 +11,12 @@ public class ServerDataManager : MonoBehaviour
     private Dictionary<uint, Player> Players = new Dictionary<uint, Player>();
     private class Player
     {
-        public string id, name;
+        public ulong id;
+        public string name;
     }
-    private string _playerID, _playerName;
+
+    private ulong _playerID;
+    private string _playerName;
 
     private void Awake()
     {
@@ -51,31 +54,31 @@ public class ServerDataManager : MonoBehaviour
         
         var dataArray = new byte[size];
         System.Runtime.InteropServices.Marshal.Copy(dataPtr, dataArray, 0, size);
-        var pIDSize = dataArray[2];
-        _playerID = Encoding.UTF8.GetString(dataArray, 3, pIDSize);
-        _playerName = Encoding.UTF8.GetString(dataArray, 3+pIDSize, dataArray.Length-3-pIDSize);
+        _playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 2, 17));
+        _playerName = Encoding.UTF8.GetString(dataArray, 19, dataArray.Length-19);
         var newPlayer = new Player
         {
             id = _playerID,
             name = _playerName
         };
         Players.Add(connectionID, newPlayer);
-
-        UpdateClientDatabse();
+        
+        ShowNewPlayerList();
     }
 
     public void RemoveFromPlayerDatabase(uint connectionID)
     {
-        Debug.Log($"SERVER: Removing player [ {Players[connectionID].name} ] from database...");
+        Debug.Log($"SERVER: Removing player [ ID: {Players[connectionID].id}, Name: {Players[connectionID].name} ] from database...");
         Players.Remove(connectionID);
 
-        UpdateClientDatabse();
+        ShowNewPlayerList();
     }
     
-    private void UpdateClientDatabse()
+    private void ShowNewPlayerList()
     {
-        Debug.Log("SERVER: New player list:");
+        var playerListString = "SERVER: New Player list:\n";
         foreach (var player in Players)
-            Debug.Log($"Player [ ID: {Players[player.Key].id}, Name: {Players[player.Key].name} ]");
+            playerListString += "ID: " + Players[player.Key].id + ", Name: " + Players[player.Key].name + "\n";
+        Debug.Log(playerListString);
     }
 }

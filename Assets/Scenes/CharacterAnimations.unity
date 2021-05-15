@@ -1683,8 +1683,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Enter text...
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 2bc93d91080743c4f9ab8f58b9f42130, type: 2}
-  m_sharedMaterial: {fileID: 4955727395803984289, guid: 2bc93d91080743c4f9ab8f58b9f42130, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 6a72a4f7b255b964a95ae7edcc03b447, type: 2}
+  m_sharedMaterial: {fileID: -5869629922348858554, guid: 6a72a4f7b255b964a95ae7edcc03b447, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1868,8 +1868,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a1d44d2b8046bf4b94b04f1ee8b7d25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  steamManager: {fileID: 0}
-  chatManager: {fileID: 704970541}
 --- !u!114 &668287138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1914,7 +1912,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae2b1c08db016bd49bd85bf176719fa6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  steamManager: {fileID: 0}
   chatInputField: {fileID: 1023351251}
   cinemachineCamera: {fileID: 260459115}
   chatCanvas: {fileID: 1713448404}
@@ -3654,13 +3651,13 @@ MonoBehaviour:
       m_Calls: []
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
-  m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
+  m_SelectionColor: {r: 1, g: 1, b: 1, a: 0.8627451}
   m_Text: 
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
   m_RichText: 1
-  m_GlobalFontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_GlobalFontAsset: {fileID: 11400000, guid: 6a72a4f7b255b964a95ae7edcc03b447, type: 2}
   m_OnFocusSelectAll: 1
   m_ResetOnDeActivation: 1
   m_RestoreOriginalTextOnEscape: 1
@@ -5589,8 +5586,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u200B"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 2bc93d91080743c4f9ab8f58b9f42130, type: 2}
-  m_sharedMaterial: {fileID: 4955727395803984289, guid: 2bc93d91080743c4f9ab8f58b9f42130, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 6a72a4f7b255b964a95ae7edcc03b447, type: 2}
+  m_sharedMaterial: {fileID: -5869629922348858554, guid: 6a72a4f7b255b964a95ae7edcc03b447, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

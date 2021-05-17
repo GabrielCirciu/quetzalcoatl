@@ -31,13 +31,13 @@ public class ServerDataManager : MonoBehaviour
     
     public void ClearPlayerDatabase()
     {
-        Debug.Log("SERVER: Clearing Player Database (Dictionary)...");
+        Debug.Log("SERVER: Clearing Player Database (Dictionary)...\n");
         Players.Clear();
     }
 
     public void ProcessRecievedData(IntPtr dataPtr, int size, uint connectionID)
     {
-        Debug.Log("SERVER: Processing new saveable data...");
+        Debug.Log("SERVER: Processing new saveable data...\n");
         
         // Checks second byte of the data array, which is the TYPE of message
         _dataTypeCheck[0] = System.Runtime.InteropServices.Marshal.ReadByte(dataPtr, 1);
@@ -64,7 +64,7 @@ public class ServerDataManager : MonoBehaviour
             name = _playerName
         };
         
-        Debug.Log($"SERVER: Adding new player [ ID: {_playerID}, Name: {_playerName} ] to the database...");
+        Debug.Log($"SERVER: Adding new player [ ID: {_playerID}, Name: {_playerName} ] to the database...\n");
         Players.Add(connectionID, newPlayer);
         
         ShowNewPlayerList();
@@ -82,10 +82,16 @@ public class ServerDataManager : MonoBehaviour
     private void SendDataToNewPlayer(uint connectionID)
     {
         // Grab all player data, pack it up, and send it as 1 package to the new connection
-        var dataString = "!q";
+        // ! - saveable, q - for new player, 1 - player data
+        var dataString = "!qa" + (char)Players.Count;
         foreach (var player in Players)
         {
-            // Nothing yet here
+            var playerNameLength = (char)Players[player.Key].name.Length;
+            var playerName = Players[player.Key].name;
+            var playerID = Players[player.Key].id;
+            dataString += playerNameLength + playerName + playerID;
         }
+        SteamManager.instance.SendDataToNewPlayer(connectionID, dataString);
+        Debug.Log($"SERVER: Sending all saved data to {Players[connectionID].name}...\nPlayer data: {dataString}\n");
     }
 }

@@ -23,9 +23,7 @@ public class ChatManager : MonoBehaviour {
     private readonly List<Message> _messageList = new List<Message>();
     private class Message
     {
-        public int nameLength;
-        public string timestamp, name, text;
-        public TMP_Text textText;
+        public TMP_Text text;
     }
 
     private void Awake() => instance = this;
@@ -108,7 +106,7 @@ public class ChatManager : MonoBehaviour {
     {
         if ( _messageList.Count >= MAXMessages )
         {
-            Destroy(_messageList[0].textText.gameObject);
+            Destroy(_messageList[0].text.gameObject);
             _messageList.Remove(_messageList[0]);
         }
     }
@@ -128,20 +126,23 @@ public class ChatManager : MonoBehaviour {
     public void ReceiveChatMessage(byte[] eMessage)
     {
         RemoveOldChat();
-        
-        var newMessage = new Message();
-        newMessage.timestamp = DateTime.Now.ToString("HH:m");
-        newMessage.nameLength = eMessage[2];
-        newMessage.name = Encoding.UTF8.GetString(eMessage, 3, newMessage.nameLength);
-        var textStartPos = 3 + newMessage.nameLength;
-        newMessage.text = Encoding.UTF8.GetString(eMessage, textStartPos, eMessage.Length-textStartPos);
-        var newTextObject = Instantiate(textObject, contentPanel.transform);
-        newMessage.textText = newTextObject.GetComponent<TMP_Text>();
-        newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <color=#00FFFF>"+
-                                    newMessage.name+"</color>: "+newMessage.text;
-        
-        _messageList.Add(newMessage);
 
+        var timestamp = DateTime.Now.ToString("HH:mm");
+        var nameLength = eMessage[2];
+        var playerName = Encoding.UTF8.GetString(eMessage, 3, nameLength);
+        var textStartPos = 3 + nameLength;
+        var text = Encoding.UTF8.GetString(eMessage, textStartPos, eMessage.Length-textStartPos);
+        
+        var newTextObject = Instantiate(textObject, contentPanel.transform);
+        var newMessage = new Message()
+        {
+            text = newTextObject.GetComponent<TMP_Text>()
+        };
+        _messageList.Add(newMessage);
+        
+        newMessage.text.text = "<size=10><color=#FF9600>"+timestamp+"</color></size> <color=#00FFFF>"+
+                               playerName+"</color>: "+text;
+        
         if ( !chatCanvas.activeSelf ) StartCoroutine( ChatFadeOut() );
     }
     
@@ -150,12 +151,12 @@ public class ChatManager : MonoBehaviour {
         RemoveOldChat();
         
         var newMessage = new Message();
-        newMessage.timestamp = DateTime.Now.ToString("HH:m");
-        newMessage.name = Encoding.UTF8.GetString(dataArray, 19, dataArray.Length-19);
+        var timestamp = DateTime.Now.ToString("HH:mm");
+        var plyerName = Encoding.UTF8.GetString(dataArray, 19, dataArray.Length-19);
         var newTextObject = Instantiate(textObject, contentPanel.transform);
-        newMessage.textText = newTextObject.GetComponent<TMP_Text>();
-        newMessage.textText.text = "<size=10><color=#FF9600>"+newMessage.timestamp+"</color></size> <color=#FFFF00>"+
-                                    newMessage.name+" has joined the world!</color>";
+        newMessage.text = newTextObject.GetComponent<TMP_Text>();
+        newMessage.text.text = "<size=10><color=#FF9600>" + timestamp + "</color></size> <color=#FFFF00>" +
+                               plyerName + " has joined the world!</color>";
         
         _messageList.Add(newMessage);
 

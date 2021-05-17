@@ -8,9 +8,8 @@ public class ClientDataManager : MonoBehaviour
     public static ClientDataManager instance;
     private ChatManager _chatManager;
     private SteamManager _steamManager;
-
-    private ulong _playerID;
-    private string _playerName;
+    private PlayerListManager _playerListManager;
+    
     private readonly Dictionary<ulong, Player> _players = new Dictionary<ulong, Player>();
     private class Player
     {
@@ -24,6 +23,7 @@ public class ClientDataManager : MonoBehaviour
     {
         _steamManager = SteamManager.instance;
         _chatManager = ChatManager.instance;
+        _playerListManager = PlayerListManager.instance;
         _steamManager.EnableClientDataManager();
         OnJoinedServer();
     }
@@ -62,35 +62,71 @@ public class ClientDataManager : MonoBehaviour
                 RemoveFromPlayerDatabase(dataArray);
                 break;
             
-            // LEAVE: "q" (in ASCII): Get all saved data from server
+            // NEW: "q" (in ASCII): Get all saved data from server as a new player
             case 113:
-                ReceiveOnJoinData();
+                ReceiveOnJoinData(dataArray);
                 break;
         }
     }
 
-    private void ReceiveOnJoinData()
+    private void ReceiveOnJoinData(byte[] dataArray)
     {
-        // Nothing yet
+        // Checks third byte of the data array
+        switch ( dataArray[2] )
+        {
+            // PLAYER DATA: "a" (in ASCII): Received all server-side player data
+            case 97:
+                ProcessAllPlayerData(dataArray);
+                break;
+        }
+    }
+
+    private void ProcessAllPlayerData(byte[] dataArray)
+    {
+        var dataString = Encoding.UTF8.GetString(dataArray, 0, dataArray.Length);
+        Debug.Log($"CLIENT: Received server-side player save data array:\n{dataString}\n");
+
+        var playerAmount = dataArray[3];
+        var arrayIndex = 4;
+        for (var i = 0; i < playerAmount; i++)
+        {
+            var playerNameLength = dataArray[arrayIndex];
+            var playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, arrayIndex+playerNameLength+1, 17));
+            var playerName = Encoding.UTF8.GetString(dataArray, arrayIndex+1, playerNameLength);
+            var newPlayer = new Player
+            {
+                id = playerID,
+                name = playerName
+            };
+            _players.Add(playerID, newPlayer);
+            arrayIndex += playerNameLength + 17 + 1;
+            Debug.Log($"CLIENT: Added new player [ ID: {_players[playerID].id}, Name: {_players[playerID].name} ] to database...\n");
+            
+            _playerListManager.AddToPlayerList(playerID, playerName);
+        }
     }
     
     private void AddToPlayerDatabase(byte[] dataArray)
     {
-        _playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 2, 17));
-        _playerName = Encoding.UTF8.GetString(dataArray, 19, dataArray.Length-19);
+        var playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 2, 17));
+        var playerName = Encoding.UTF8.GetString(dataArray, 19, dataArray.Length-19);
         var newPlayer = new Player
         {
-            id = _playerID,
-            name = _playerName
+            id = playerID,
+            name = playerName
         };
-        _players.Add(_playerID, newPlayer);
-        Debug.Log($"CLIENT: Added new player [ ID: {_players[_playerID].id}, Name: {_players[_playerID].name} ] to database...");
+        _players.Add(playerID, newPlayer);
+        Debug.Log($"CLIENT: Added new player [ ID: {_players[playerID].id}, Name: {_players[playerID].name} ] to database...\n");
+        
+        _playerListManager.AddToPlayerList(playerID, playerName);
     }
 
     private void RemoveFromPlayerDatabase(byte[] dataArray)
     {
-        _playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 2, 17));
-        Debug.Log($"CLIENT: Removing [ ID: {_players[_playerID].id}, Name: {_players[_playerID].name} ] from the database...");
-        _players.Remove(_playerID);
+        var playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 2, 17));
+        Debug.Log($"CLIENT: Removing [ ID: {_players[playerID].id}, Name: {_players[playerID].name} ] from the database...\n");
+        _players.Remove(playerID);
+        
+        _playerListManager.RemoveFromPlayerList(playerID);
     }
 }

@@ -14,12 +14,12 @@ public class SteamSocketManager : SocketManager
     public override void OnConnected(Connection connection, ConnectionInfo info)
     {
 		base.OnConnected(connection, info);
-        Debug.Log($"SERVER: Client [ ID: {connection.Id} ] has connected.");
+        Debug.Log($"SERVER: Client [ ID: {connection.Id} ] has connected.\n");
     }
 	public override void OnDisconnected(Connection connection, ConnectionInfo info)
     {
 		base.OnDisconnected(connection, info);
-        Debug.Log($"SERVER: Client [ ID: {connection.Id} ] has disconnected");
+        Debug.Log($"SERVER: Client [ ID: {connection.Id} ] has disconnected\n");
         SteamManager.instance.RemoveFromPlayerDatabase(connection.Id);
     }
     public override void OnMessage(Connection connection, NetIdentity identity, IntPtr data, int size, long messageNum, long recvTime, int channel)
@@ -44,18 +44,18 @@ public class SteamConnectionManager : ConnectionManager
     public override void OnConnected(ConnectionInfo info)
     {
         base.OnConnected(info);
-        Debug.Log("CLIENT: Connected to server");
+        Debug.Log("CLIENT: Connected to server\n");
         SceneManager.LoadScene("CharacterAnimations");
     }
     public override void OnDisconnected(ConnectionInfo info)
     {
         base.OnDisconnected(info);
-        Debug.Log("CLIENT: Disconnected from server");
+        Debug.Log("CLIENT: Disconnected from server\n");
         SceneManager.LoadScene("MenuScene");
     }
     public override void OnMessage(IntPtr data, int size, long messageNum, long recvTime, int channel)
     {
-        Debug.Log("CLIENT: Data recieved. Processing...");
+        Debug.Log("CLIENT: Data recieved. Processing...\n");
         SteamManager.instance.ProcessMessageFromSocketServer(data, size);
     }
 }

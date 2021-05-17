@@ -44,10 +44,7 @@ public class SteamManager : MonoBehaviour {
         else if (instance != this) Destroy(gameObject);
     }
 
-    private void Start()
-    {
-        _serverDataManager = ServerDataManager.instance;
-    }
+    private void Start() => _serverDataManager = ServerDataManager.instance;
 
     private void Update()
     {
@@ -62,15 +59,15 @@ public class SteamManager : MonoBehaviour {
 
     public void CreateSteamSocketServer()
     {
-        Debug.Log("SERVER: Creating Steam Socket Server");
+        Debug.Log("SERVER: Creating Steam Socket Server\n");
         
         _steamSocketManager = SteamNetworkingSockets.CreateRelaySocket<SteamSocketManager>();
         _steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(PlayerSteamId);
         
         if (_steamSocketManager != null) activeSteamSocketServer = true;
-            else Debug.LogError("SERVER: Socket Manager = null");
+            else Debug.LogError("SERVER: Socket Manager = null", this);
         if (_steamConnectionManager != null) activeSteamSocketConnection = true;
-            else Debug.LogError("SERVER: Connection Manager = null");
+            else Debug.LogError("SERVER: Connection Manager = null", this);
         
         _serverDataManager.ClearPlayerDatabase();
     }
@@ -79,7 +76,7 @@ public class SteamManager : MonoBehaviour {
     {
         _steamConnectionManager = SteamNetworkingSockets.ConnectRelay<SteamConnectionManager>(FriendSteamId);
         if (_steamConnectionManager != null) activeSteamSocketConnection = true;
-            else Debug.LogError("CLIENT: Connection Manager = null");
+            else Debug.LogError("CLIENT: Connection Manager = null", this);
     }
 
     public void LeaveSteamSocketServer()
@@ -170,6 +167,26 @@ public class SteamManager : MonoBehaviour {
 
         _serverDataManager.Players.Remove(connectionID);
         _serverDataManager.ShowNewPlayerList();
+    }
+
+    public void SendDataToNewPlayer(uint connectionID, string messageString)
+    {
+        try
+        {
+            // NEW-PLAYER: "!q" as player left identifier sent to clients, "!" as it's a saveable data
+            var messageToByte = Encoding.UTF8.GetBytes(messageString);
+            var messageSize = messageString.Length;
+            var messaegIntPtr = System.Runtime.InteropServices.Marshal.AllocHGlobal(messageSize);
+            System.Runtime.InteropServices.Marshal.Copy(messageToByte, 0, messaegIntPtr, messageSize);
+            for (var i = 0; i < _steamSocketManager.Connected.Count; i++)
+            {
+                if (_steamSocketManager.Connected[i].Id != connectionID) continue;
+                var success = _steamSocketManager.Connected[i].SendMessage(messaegIntPtr, messageSize);
+                if (success != Result.OK) Debug.LogError("SERVER: Socket Message sending result not OK", this);
+                else System.Runtime.InteropServices.Marshal.FreeHGlobal(messaegIntPtr);
+            }
+        }
+        catch (Exception e) { Debug.LogError($"SERVER: Error sending data! Exception: {e}", this); }
     }
 
     public void EnableClientDataManager()

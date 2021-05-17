@@ -10974,7 +10974,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: " - Chat coding and memory reserval improved\n - Added fully functional
     client-side database\n - Added player list\n - Added player data fetch from server
-    for new clients"
+    for new clients\n - Added networked character spawning"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 6a72a4f7b255b964a95ae7edcc03b447, type: 2}
   m_sharedMaterial: {fileID: -5869629922348858554, guid: 6a72a4f7b255b964a95ae7edcc03b447, type: 2}

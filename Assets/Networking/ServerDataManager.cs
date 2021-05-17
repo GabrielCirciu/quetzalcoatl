@@ -35,7 +35,7 @@ public class ServerDataManager : MonoBehaviour
         Players.Clear();
     }
 
-    public void ProcessRecievedData(IntPtr dataPtr, int size, uint connectionID)
+    public void ProcessReceivedSaveData(IntPtr dataPtr, int size, uint connectionID)
     {
         Debug.Log("SERVER: Processing new saveable data...\n");
         

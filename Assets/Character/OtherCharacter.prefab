@@ -226,10 +226,8 @@ GameObject:
   m_Component:
   - component: {fileID: 17258768704967534}
   - component: {fileID: 6259295494209947924}
-  - component: {fileID: 556170085701909881}
-  - component: {fileID: 556170085701909880}
   m_Layer: 0
-  m_Name: Character
+  m_Name: OtherCharacter
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -273,41 +271,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!143 &556170085701909881
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 825988794344524244}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Height: 1.8
-  m_Radius: 0.3
-  m_SlopeLimit: 60
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.02
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.91, z: 0}
---- !u!114 &556170085701909880
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 825988794344524244}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9345590fb542f734c9551f507b6ec156, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  lookAtObj: {fileID: 0}
-  groundCheck: {fileID: 556170086641489150}
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 2048
 --- !u!1 &1186581216311051278
 GameObject:
   m_ObjectHideFlags: 0

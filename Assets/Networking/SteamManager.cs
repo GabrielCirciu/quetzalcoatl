@@ -97,7 +97,7 @@ public class SteamManager : MonoBehaviour {
     {
         // Checks the first byte, if 33 ("!"), it has to save on server, otherwise just relay
         _dataTypeCheck[0] = System.Runtime.InteropServices.Marshal.ReadByte(dataPtr);
-        if (_dataTypeCheck[0] == 33) _serverDataManager.ProcessRecievedData(dataPtr, size, connectionID);
+        if (_dataTypeCheck[0] == 33) _serverDataManager.ProcessReceivedSaveData(dataPtr, size, connectionID);
         
         try 
         {

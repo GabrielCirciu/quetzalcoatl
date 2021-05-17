@@ -9,12 +9,16 @@ public class ClientDataManager : MonoBehaviour
     private ChatManager _chatManager;
     private SteamManager _steamManager;
     private PlayerListManager _playerListManager;
+    private CharacterNetworkedStats _characterNetworkedStats;
+
+    [SerializeField] private GameObject characterObj, characterSpawner;
     
     private readonly Dictionary<ulong, Player> _players = new Dictionary<ulong, Player>();
     private class Player
     {
         public ulong id;
         public string name;
+        public GameObject character;
     }
 
     private void Awake() => instance = this;
@@ -24,6 +28,7 @@ public class ClientDataManager : MonoBehaviour
         _steamManager = SteamManager.instance;
         _chatManager = ChatManager.instance;
         _playerListManager = PlayerListManager.instance;
+        _characterNetworkedStats = CharacterNetworkedStats.instance;
         _steamManager.EnableClientDataManager();
         OnJoinedServer();
     }
@@ -46,6 +51,11 @@ public class ClientDataManager : MonoBehaviour
         // Checks second byte of the data array
         switch ( dataArray[1] )
         {
+            // CHARACTER: "1" (in ASCII): Receive character data (position/ rotation/ velocity/ etc.)
+            case 49:
+                _characterNetworkedStats.ReceiveNetworkedCharacterData();
+                break;
+            
             // CHAT: "n" (in ASCII): Receive chat message
             case 110:
                 _chatManager.ReceiveChatMessage(dataArray);
@@ -88,6 +98,8 @@ public class ClientDataManager : MonoBehaviour
 
         var playerAmount = dataArray[3];
         var arrayIndex = 4;
+        var mySteamID = SteamClient.SteamId;
+        
         for (var i = 0; i < playerAmount; i++)
         {
             var playerNameLength = dataArray[arrayIndex];
@@ -103,6 +115,8 @@ public class ClientDataManager : MonoBehaviour
             Debug.Log($"CLIENT: Added new player [ ID: {_players[playerID].id}, Name: {_players[playerID].name} ] to database...\n");
             
             _playerListManager.AddToPlayerList(playerID, playerName);
+
+            if (_players[playerID].id != mySteamID) SpawnCharacter(playerID);
         }
     }
     
@@ -119,14 +133,22 @@ public class ClientDataManager : MonoBehaviour
         Debug.Log($"CLIENT: Added new player [ ID: {_players[playerID].id}, Name: {_players[playerID].name} ] to database...\n");
         
         _playerListManager.AddToPlayerList(playerID, playerName);
+        
+        SpawnCharacter(playerID);
+    }
+
+    private void SpawnCharacter(ulong playerID)
+    {
+        _players[playerID].character = Instantiate(characterObj, characterSpawner.transform);
     }
 
     private void RemoveFromPlayerDatabase(byte[] dataArray)
     {
         var playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 2, 17));
         Debug.Log($"CLIENT: Removing [ ID: {_players[playerID].id}, Name: {_players[playerID].name} ] from the database...\n");
-        _players.Remove(playerID);
         
+        Destroy(_players[playerID].character);
+        _players.Remove(playerID);
         _playerListManager.RemoveFromPlayerList(playerID);
     }
 }

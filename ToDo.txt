@@ -4,19 +4,10 @@ Fixing and slight improvements:
 	Add On-Disconnect message and remove from player list
 	Make Single-Player actually single-player (or private server)
 
-Network:
-	Look into data serialization to send over the network (json or other format)
-	(might be easier to handle multiple kinds of code data)
-
-Set up data filtering and synchronization:
-	Data labeled at first (or first two) bytes of the data array
-	Data label will differentiate between chat, position, rotation
-	Server only handles distribution of data
-	Client handles decoding data and acting according to data label
-
-Port project over to a fresh build:
-	Move all currently used and useful scripts and objects to a new project
-	Clean up all the scripts to make them more modular, less singleton based
+Set up synchronization:
+	On player join, spawn them in
+	For new players, spawn all existing players in
+	Synchronize position and rotation of each player
 
 Set up all menu items:
 	Use the designed UI layout for the game

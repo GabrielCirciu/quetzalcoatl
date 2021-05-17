@@ -1,5 +1,5 @@
 # QUETZALCOATL
-A private repo for managing the project files without the possibility of completely losing them
+A private repo for managing the project files with other memebers of the team, and without the possibility of completely losing them in the future
 
 # To do:
 
@@ -25,7 +25,7 @@ A private repo for managing the project files without the possibility of complet
 	World's Data Folders will be: ../Worlds/%World_Name_UID/..
 	World <ANY> Data file will be: ../%World_Name_UID/%Data.dat
 
-# Set up Character creation:
+# Character Creation:
 	Set up full character creation UI functionality with Create/Delete
 	Implement character customization and saving it to a file/ loading it
 	Character customizer should include for now: Character Name, Base Color

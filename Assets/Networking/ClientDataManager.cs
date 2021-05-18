@@ -65,7 +65,7 @@ public class ClientDataManager : MonoBehaviour
                         AddToPlayerDatabase(dataArray);
                         break;
                     // ASCII: L - Left server
-                    case 112:
+                    case 76:
                         RemoveFromPlayerDatabase(dataArray);
                         break;
                 }

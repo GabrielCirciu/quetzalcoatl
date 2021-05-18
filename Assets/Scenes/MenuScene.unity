@@ -14221,10 +14221,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: " - Slight chat re-structure\n - Added character spawning AND de-spawning\n 
-    - Added character position synchronization\n - Added chat message when player
-    has left\n - Re-structure of data verification bytes for easier read\n - Added
-    player position synchronization"
+  m_text: " - Slight chat re-structure\n - Added character spawning AND de-spawning\n
+    - Added basic character position and rotation synchronization\n - Added chat
+    message when player has left\n - Re-structure of data verification bytes for
+    easier read"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 6a72a4f7b255b964a95ae7edcc03b447, type: 2}
   m_sharedMaterial: {fileID: -5869629922348858554, guid: 6a72a4f7b255b964a95ae7edcc03b447, type: 2}

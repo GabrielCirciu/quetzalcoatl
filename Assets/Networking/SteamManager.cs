@@ -95,9 +95,9 @@ public class SteamManager : MonoBehaviour {
 
     public void RelaySocketMessageReceived(IntPtr dataPtr, int size, uint connectionID)
     {
-        // Checks the first byte, if 33 ("!"), it has to save on server, otherwise just relay
+        // Check first byte, if ASCII: S - Save data
         _dataTypeCheck[0] = System.Runtime.InteropServices.Marshal.ReadByte(dataPtr);
-        if (_dataTypeCheck[0] == 33) _serverDataManager.ProcessReceivedSaveData(dataPtr, size, connectionID);
+        if (_dataTypeCheck[0] == 83) _serverDataManager.ProcessReceivedSaveData(dataPtr, size, connectionID);
         
         try 
         {
@@ -150,8 +150,8 @@ public class SteamManager : MonoBehaviour {
         Debug.Log($"SERVER: Removing player [ ID: {_serverDataManager.Players[connectionID].id}, Name: {_serverDataManager.Players[connectionID].name} ] from database...");
         try
         {
-            // LEAVE: "p" as player left identifier sent to clients, "!" as it's a saveable data
-            var messageString = "!p" + _serverDataManager.Players[connectionID].id;
+            // ASCII: S - Save, P - Player, L - Left server
+            var messageString = "SPL" + _serverDataManager.Players[connectionID].id;
             var messageToByte = Encoding.UTF8.GetBytes(messageString);
             var messageSize = messageString.Length;
             var messaegIntPtr = System.Runtime.InteropServices.Marshal.AllocHGlobal(messageSize);
@@ -173,7 +173,6 @@ public class SteamManager : MonoBehaviour {
     {
         try
         {
-            // NEW-PLAYER: "!q" as player left identifier sent to clients, "!" as it's a saveable data
             var messageToByte = Encoding.UTF8.GetBytes(messageString);
             var messageSize = messageString.Length;
             var messaegIntPtr = System.Runtime.InteropServices.Marshal.AllocHGlobal(messageSize);

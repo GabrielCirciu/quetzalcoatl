@@ -4,8 +4,6 @@ A private repo for managing the project files with other memebers of the team, a
 # To do:
 
 # Network:
-	On player join, spawn them in for other clients
-	For new clients, spawn all existing players in
 	Synchronize position and rotation of each player
 
 # UI:

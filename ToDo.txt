@@ -1,22 +1,15 @@
 To do:
 
-Fixing and slight improvements:
-	On join message and chat texts recentering check
-	Restructure data bytes for better serialization ie: [!o1]
-	Add On-Disconnect message and remove from player list
-	Make Single-Player actually single-player (or private server)
-
 Set up synchronization:
-	On player join, spawn them in
-	For new players, spawn all existing players in
 	Synchronize position and rotation of each player
 
+Fixing and slight improvements:
+	Make Single-Player actually single-player (or private server)
+
 Set up all menu items:
-	Use the designed UI layout for the game
 	Implement every menu button, slider, dropdown
 	Set up every aspect to be functional
 	Implement in-game menu, with full functionality
-	Set up placeholders for unused menus
 
 Set up Server Creation UI and savings:
 	When hosting server, Server Name should be given
@@ -39,10 +32,3 @@ Set up Character creation:
 	Implement character customization and saving it to a file/ loading it
 	Character customizer should include for now: Character Name, Base Color
 	Saving/Loading should be handled by an identifier: Name <UID>
-
-Set up Character sync over server:
-	Implement server sync of custom character features to be loaded on join
-	Server should handle keeping track of all players (position/rotation/customization)
-	All tracked player data is sent to new client on join
-	Client should save all server related data periodically to keep track at re-joining
-	Data includes: ServerWorldID, Position, Rotation, Character Features

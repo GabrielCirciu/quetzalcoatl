@@ -13,8 +13,8 @@ public class ClientDataManager : MonoBehaviour
 
     [SerializeField] private GameObject characterObj, characterSpawner;
     
-    private readonly Dictionary<ulong, Player> _players = new Dictionary<ulong, Player>();
-    private class Player
+    public readonly Dictionary<ulong, Player> players = new Dictionary<ulong, Player>();
+    public class Player
     {
         public ulong id;
         public string name;
@@ -35,15 +35,15 @@ public class ClientDataManager : MonoBehaviour
     
     private void OnJoinedServer()
     {
-        // ASCII: ! - Save on server, o - Join Message
+        // ASCII: S - Save, P - Player, J - Join
         // Accound ID is a Steam 64 ID, which is 17 digits long
-        const string messageIdentifier = "!o";
+        const string messageIdentifier = "SPJ";
         var accountID = SteamClient.SteamId.Value;
         var accountName = SteamClient.Name;
         var messageString = messageIdentifier + accountID + accountName;
         var messageToByte = Encoding.UTF8.GetBytes(messageString);
         _steamManager.SendMessageToSocketServer(messageToByte);
-        _chatManager.ReceiveJoinMessage(messageToByte);
+        _chatManager.ReceiveJoinOrLeaveMessage(accountName, " has joined the world!");
     }
 
     public void ProcessRecievedData(byte[] dataArray)
@@ -51,42 +51,48 @@ public class ClientDataManager : MonoBehaviour
         // Checks second byte of the data array
         switch ( dataArray[1] )
         {
-            // CHARACTER: "1" (in ASCII): Receive character data (position/ rotation/ velocity/ etc.)
-            case 49:
-                _characterNetworkedStats.ReceiveNetworkedCharacterData();
+            // ASCII: P - Player
+            case 80:
+                // Checks third byte of the data array
+                switch ( dataArray[2] )
+                {
+                    // ASCII: P - Position/Rotation/Velocity data
+                    case 80:
+                        _characterNetworkedStats.ReceiveNetworkedCharacterData(dataArray);
+                        break;
+                    // ASCII: J - Joined server
+                    case 74:
+                        AddToPlayerDatabase(dataArray);
+                        break;
+                    // ASCII: L - Left server
+                    case 112:
+                        RemoveFromPlayerDatabase(dataArray);
+                        break;
+                }
                 break;
-            
-            // CHAT: "n" (in ASCII): Receive chat message
-            case 110:
-                _chatManager.ReceiveChatMessage(dataArray);
-                break;
-            
-            // JOIN: "o" (in ASCII): Receive join chat message and add new player to database
-            case 111:
-                _chatManager.ReceiveJoinMessage(dataArray);
-                AddToPlayerDatabase(dataArray);
-                break;
-            
-            // LEAVE: "p" (in ASCII): Receive leave data, remove specific player
-            case 112:
-                RemoveFromPlayerDatabase(dataArray);
-                break;
-            
-            // NEW: "q" (in ASCII): Get all saved data from server as a new player
-            case 113:
-                ReceiveOnJoinData(dataArray);
-                break;
-        }
-    }
 
-    private void ReceiveOnJoinData(byte[] dataArray)
-    {
-        // Checks third byte of the data array
-        switch ( dataArray[2] )
-        {
-            // PLAYER DATA: "a" (in ASCII): Received all server-side player data
-            case 97:
-                ProcessAllPlayerData(dataArray);
+            // ASCII: C - Chat
+            case 67:
+                // Checks third byte of the data array
+                switch ( dataArray[2] )
+                {
+                    // ASCII: G - General chat message
+                    case 71:
+                        _chatManager.ReceiveChatMessage(dataArray);
+                        break;
+                }
+                break;
+
+            // ASCII: N - New player data received on joining server
+            case 78:
+                // Checks third byte of the data array
+                switch ( dataArray[2] )
+                {
+                    // ASCII: P - Player data
+                    case 80:
+                        ProcessAllPlayerData(dataArray);
+                        break;
+                }
                 break;
         }
     }
@@ -110,45 +116,46 @@ public class ClientDataManager : MonoBehaviour
                 id = playerID,
                 name = playerName
             };
-            _players.Add(playerID, newPlayer);
+            players.Add(playerID, newPlayer);
             arrayIndex += playerNameLength + 17 + 1;
-            Debug.Log($"CLIENT: Added new player [ ID: {_players[playerID].id}, Name: {_players[playerID].name} ] to database...\n");
+            Debug.Log($"CLIENT: Added new player [ ID: {players[playerID].id}, Name: {players[playerID].name} ] to database...\n");
             
             _playerListManager.AddToPlayerList(playerID, playerName);
 
-            if (_players[playerID].id != mySteamID) SpawnCharacter(playerID);
+            if (players[playerID].id != mySteamID) SpawnCharacter(playerID);
         }
     }
     
     private void AddToPlayerDatabase(byte[] dataArray)
     {
-        var playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 2, 17));
-        var playerName = Encoding.UTF8.GetString(dataArray, 19, dataArray.Length-19);
+        var playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 3, 17));
+        var playerName = Encoding.UTF8.GetString(dataArray, 20, dataArray.Length-20);
         var newPlayer = new Player
         {
             id = playerID,
             name = playerName
         };
-        _players.Add(playerID, newPlayer);
-        Debug.Log($"CLIENT: Added new player [ ID: {_players[playerID].id}, Name: {_players[playerID].name} ] to database...\n");
+        players.Add(playerID, newPlayer);
+        Debug.Log($"CLIENT: Added new player [ ID: {players[playerID].id}, Name: {players[playerID].name} ] to database...\n");
         
         _playerListManager.AddToPlayerList(playerID, playerName);
-        
+        _chatManager.ReceiveJoinOrLeaveMessage(playerName, " has joined the world!");
         SpawnCharacter(playerID);
     }
 
     private void SpawnCharacter(ulong playerID)
     {
-        _players[playerID].character = Instantiate(characterObj, characterSpawner.transform);
+        players[playerID].character = Instantiate(characterObj, characterSpawner.transform);
     }
 
     private void RemoveFromPlayerDatabase(byte[] dataArray)
     {
-        var playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 2, 17));
-        Debug.Log($"CLIENT: Removing [ ID: {_players[playerID].id}, Name: {_players[playerID].name} ] from the database...\n");
+        var playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 3, 17));
+        Debug.Log($"CLIENT: Removing [ ID: {players[playerID].id}, Name: {players[playerID].name} ] from the database...\n");
         
-        Destroy(_players[playerID].character);
-        _players.Remove(playerID);
+        _chatManager.ReceiveJoinOrLeaveMessage(players[playerID].name, " has left the world!");
+        Destroy(players[playerID].character);
+        players.Remove(playerID);
         _playerListManager.RemoveFromPlayerList(playerID);
     }
 }

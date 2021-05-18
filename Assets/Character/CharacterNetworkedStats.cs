@@ -1,4 +1,4 @@
-using System.Timers;
+using System.Text;
 using Steamworks;
 using UnityEngine;
 
@@ -7,45 +7,45 @@ public class CharacterNetworkedStats : MonoBehaviour
     public static CharacterNetworkedStats instance;
     private SteamManager _steamManager;
     private ClientDataManager _clientDataManager;
-    private ulong _steamID;
+    private ulong _localSteamID, _receivedSteamID;
     private string _dataString;
-    private Transform _positionTransform;
-    private Vector3 _positionVector;
-
-    private Timer _timer;
+    private Transform _localPlayerTransform;
+    private Vector3 _localPlayerVector3, _receivedPlayerVector3;
     
+    // ASCII: N - No save, P - Player, P - Position (send ID, position, rotation, etc.)
+    private const string DataIdentifier = "NPP";
+
     private void Awake() => instance = this;
 
     private void Start()
     {
         _steamManager = SteamManager.instance;
         _clientDataManager = ClientDataManager.instance;
-        _steamID = SteamClient.SteamId.Value;
+        _localSteamID = SteamClient.SteamId.Value;
         
-        _positionTransform = GetComponent<Transform>();
-        _positionVector = _positionTransform.position;
-        Debug.Log($"Starting position: {_positionVector}");
+        _localPlayerTransform = GetComponent<Transform>();
 
-        _timer = new Timer(1000);
-        _timer.Elapsed += TimeElapsed;
-        _timer.Enabled = true;
-    }
-
-    private void TimeElapsed(object sender, ElapsedEventArgs e)
-    {
-        SendNetworkedCharacterData();
+        InvokeRepeating(nameof(SendNetworkedCharacterData), 1.0f, 1.0f);
     }
 
     private void SendNetworkedCharacterData()
     {
-        // TODO
-        // #1 for position, need to send ID, position, rotation, velocity, animations, etc
-        //_dataString = "#1"+_steamID+" --- "+_positionVector.x+";"+_positionVector.y+";"+_positionVector.z;
-        Debug.Log($"CLIENT: Sending character data...\nString: ()\n");
+        _localPlayerVector3 = _localPlayerTransform.position;
+        _dataString = DataIdentifier + _localSteamID + _localPlayerVector3.x.ToString("+0000.00;-0000.00") +
+                      _localPlayerVector3.y.ToString("+0000.00;-0000.00") + _localPlayerVector3.z.ToString("+0000.00;-0000.00");
+        var dataArray = Encoding.UTF8.GetBytes(_dataString);
+        _steamManager.SendMessageToSocketServer(dataArray);
     }
 
-    public void ReceiveNetworkedCharacterData()
+    public void ReceiveNetworkedCharacterData(byte[] dataArray)
     {
-        // Read someone's position, rotation, velocity, animations, all that
+        // Change a character position based on ID.
+        _receivedSteamID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 3, 17));
+        _receivedPlayerVector3 = _clientDataManager.players[_receivedSteamID].character.transform.position;
+        _receivedPlayerVector3.x = int.Parse(Encoding.UTF8.GetString(dataArray, 20, 8));
+        _receivedPlayerVector3.y = int.Parse(Encoding.UTF8.GetString(dataArray, 28, 8));
+        _receivedPlayerVector3.z = int.Parse(Encoding.UTF8.GetString(dataArray, 36, 8));
+        
+        Debug.Log($"CLIENT: Received character data...\nID: {_receivedSteamID}, Pos: {_receivedPlayerVector3}\n");
     }
 }

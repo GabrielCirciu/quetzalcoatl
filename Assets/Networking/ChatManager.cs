@@ -7,8 +7,8 @@ using UnityEngine;
 using TMPro;
 using Cinemachine;
 
-public class ChatManager : MonoBehaviour {
-    
+public class ChatManager : MonoBehaviour
+{
     public static ChatManager instance;
     private SteamManager _steamManager;
     private CinemachineFreeLook _cameraFreeLook;
@@ -104,17 +104,15 @@ public class ChatManager : MonoBehaviour {
 
     private void RemoveOldChat()
     {
-        if ( _messageList.Count >= MAXMessages )
-        {
-            Destroy(_messageList[0].text.gameObject);
-            _messageList.Remove(_messageList[0]);
-        }
+        if (_messageList.Count < MAXMessages) return;
+        Destroy(_messageList[0].text.gameObject);
+        _messageList.Remove(_messageList[0]);
     }
     
     private void SendChatMessage(string chatText)
     {
-        // # - Do not save, n - Chat message
-        const string messageIdentifier = "#n";
+        // ASCII: N - No-Save, C - Chat, G - General
+        const string messageIdentifier = "NCG";
         var messageName = SteamClient.Name;
         var messageNameLength = (char)messageName.Length;
         var messageString = messageIdentifier+messageNameLength+messageName+chatText;
@@ -128,9 +126,9 @@ public class ChatManager : MonoBehaviour {
         RemoveOldChat();
 
         var timestamp = DateTime.Now.ToString("HH:mm");
-        var nameLength = eMessage[2];
-        var playerName = Encoding.UTF8.GetString(eMessage, 3, nameLength);
-        var textStartPos = 3 + nameLength;
+        var nameLength = eMessage[3];
+        var playerName = Encoding.UTF8.GetString(eMessage, 4, nameLength);
+        var textStartPos = 4 + nameLength;
         var text = Encoding.UTF8.GetString(eMessage, textStartPos, eMessage.Length-textStartPos);
         
         var newTextObject = Instantiate(textObject, contentPanel.transform);
@@ -146,17 +144,16 @@ public class ChatManager : MonoBehaviour {
         if ( !chatCanvas.activeSelf ) StartCoroutine( ChatFadeOut() );
     }
     
-    public void ReceiveJoinMessage(byte[] dataArray)
+    public void ReceiveJoinOrLeaveMessage(string playerName, string text)
     {
         RemoveOldChat();
         
         var newMessage = new Message();
         var timestamp = DateTime.Now.ToString("HH:mm");
-        var plyerName = Encoding.UTF8.GetString(dataArray, 19, dataArray.Length-19);
         var newTextObject = Instantiate(textObject, contentPanel.transform);
         newMessage.text = newTextObject.GetComponent<TMP_Text>();
         newMessage.text.text = "<size=10><color=#FF9600>" + timestamp + "</color></size> <color=#FFFF00>" +
-                               plyerName + " has joined the world!</color>";
+                               playerName + text + "</color>";
         
         _messageList.Add(newMessage);
 

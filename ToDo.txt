@@ -1,8 +1,5 @@
 To do:
 
-Set up synchronization:
-	Synchronize position and rotation of each player
-
 Fixing and slight improvements:
 	Make Single-Player actually single-player (or private server)
 

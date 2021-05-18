@@ -8,7 +8,7 @@ public class CharacterNetworkedStats : MonoBehaviour
     private SteamManager _steamManager;
     private ClientDataManager _clientDataManager;
     private ulong _localSteamID, _receivedSteamID;
-    private string _dataString;
+    private string _dataString, _receivedDataString;
     private Transform _localPlayerTransform;
     private Vector3 _localPlayerVector3, _receivedPlayerVector3;
     
@@ -41,11 +41,12 @@ public class CharacterNetworkedStats : MonoBehaviour
     {
         // Change a character position based on ID.
         _receivedSteamID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 3, 17));
+        _receivedDataString = Encoding.UTF8.GetString(dataArray, 20, dataArray.Length - 20);
         //_receivedPlayerVector3 = _clientDataManager.players[_receivedSteamID].character.transform.position;
         _receivedPlayerVector3.x = float.Parse(Encoding.UTF8.GetString(dataArray, 20, 8));
         //_receivedPlayerVector3.y = int.Parse(Encoding.UTF8.GetString(dataArray, 28, 8));
         //_receivedPlayerVector3.z = int.Parse(Encoding.UTF8.GetString(dataArray, 36, 8));
         
-        Debug.Log($"CLIENT: Received character data...\nID: {_receivedSteamID}, Pos: {_receivedPlayerVector3.x}\n");
+        Debug.Log($"CLIENT: Received character data...\nID: {_receivedSteamID}, Pos: {_receivedDataString}\n");
     }
 }

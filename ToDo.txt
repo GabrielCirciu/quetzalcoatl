@@ -1,6 +1,8 @@
 To do:
 
 Fixing and slight improvements:
+	On join message and chat texts recentering check
+	Restructure data bytes for better serialization ie: [!o1]
 	Add On-Disconnect message and remove from player list
 	Make Single-Player actually single-player (or private server)
 

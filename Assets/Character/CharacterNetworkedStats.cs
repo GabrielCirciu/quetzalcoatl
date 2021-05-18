@@ -56,8 +56,5 @@ public class CharacterNetworkedStats : MonoBehaviour
         var characterTransform = _clientDataManager.players[_receivedSteamID].character.transform;
         characterTransform.position = _receivedPlayerPositionVector;
         characterTransform.rotation = Quaternion.Euler(0f, _receivedPlayerRotationVectorY, 0f);
-
-        _receivedDataString = Encoding.UTF8.GetString(dataArray, 0, dataArray.Length);
-        Debug.Log($"CLIENT: Received character data...\nID: {_receivedSteamID}, Pos: {_receivedDataString}\n");
     }
 }

@@ -8788,6 +8788,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2046664090}
     - target: {fileID: 3896574233707186722, guid: 014257a2909fcbc4f8d6eaeca289b37f, type: 3}
+      propertyPath: cubey
+      value: 
+      objectReference: {fileID: 2046664090}
+    - target: {fileID: 3896574233707186722, guid: 014257a2909fcbc4f8d6eaeca289b37f, type: 3}
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}

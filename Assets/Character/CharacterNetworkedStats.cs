@@ -1,20 +1,26 @@
+using System;
 using System.Text;
 using Steamworks;
 using UnityEngine;
 
 public class CharacterNetworkedStats : MonoBehaviour
 {
+    // ASCII: N - No save, P - Player, P - Position (send ID, position, rotation, etc.)
+    private const string DataIdentifier = "NPP";
+    
     public static CharacterNetworkedStats instance;
     private SteamManager _steamManager;
     private ClientDataManager _clientDataManager;
-    private ulong _localSteamID, _receivedSteamID;
-    private string _dataString, _receivedDataString;
-    private Transform _localPlayerTransform;
-    private Vector3 _localPlayerPositionVector, _receivedPlayerPositionVector;
-    private float _localPlayerRotationVectorY, _receivedPlayerRotationVectorY;
+    private ulong _receivedSteamId;
+    private Transform _localPlayerTransform, _receivedPlayerTransform;
+    private Vector3 _localPosV3, _receivedPosV3;
+    private float _localRotEulerY, _receivedRotEulerY;
+    private byte[] _dataIdArray, _localSteamIdArray, _receivedSteamIdArray, _finalDataArray;
+    private float[] _localPlayerFloatArray, _receivedPlayerFloatArray;
 
-    // ASCII: N - No save, P - Player, P - Position (send ID, position, rotation, etc.)
-    private const string DataIdentifier = "NPP";
+    public GameObject cubey;
+    private Transform _cubeyTransform;
+    private Vector3 _cubeyPosV3;
 
     private void Awake() => instance = this;
 
@@ -22,39 +28,61 @@ public class CharacterNetworkedStats : MonoBehaviour
     {
         _steamManager = SteamManager.instance;
         _clientDataManager = ClientDataManager.instance;
-        _localSteamID = SteamClient.SteamId.Value;
         _localPlayerTransform = GetComponent<Transform>();
+        
+        _dataIdArray = Encoding.UTF8.GetBytes(DataIdentifier);
+        _localSteamIdArray = BitConverter.GetBytes(SteamClient.SteamId.Value);
 
+        _cubeyTransform = cubey.GetComponent<Transform>();
+
+        _receivedPlayerFloatArray = new float[4];
         InvokeRepeating(nameof(SendNetworkedCharacterData), 3.0f, 0.1f);
     }
 
     private void SendNetworkedCharacterData()
     {
-        _localPlayerPositionVector = _localPlayerTransform.position;
-        _localPlayerRotationVectorY = _localPlayerTransform.rotation.eulerAngles.y;
+        _localPosV3 = _localPlayerTransform.position;
+        _localRotEulerY = _localPlayerTransform.rotation.eulerAngles.y;
+        _localPlayerFloatArray = new[] {_localPosV3.x, _localPosV3.y, _localPosV3.z, _localRotEulerY};
+        
+        _finalDataArray = new byte[3 + 8 + 16];
+        Buffer.BlockCopy(_dataIdArray, 0, _finalDataArray, 0, 3);
+        Buffer.BlockCopy(_localSteamIdArray, 0, _finalDataArray, 3, 8);
+        Buffer.BlockCopy(_localPlayerFloatArray, 0, _finalDataArray, 11, 16);
+        
+        /* FOR TESTING PURPOSES
+        // Run backwards call as if we were the receiver
+        _receivedSteamId = BitConverter.ToUInt64(_finalDataArray, 3);
+        Buffer.BlockCopy(_finalDataArray, 11, _receivedPlayerFloatArray, 0, 16);
+        
+        // Move Cubey
+        _cubeyPosV3 = new Vector3(_receivedPlayerFloatArray[0], 3, _receivedPlayerFloatArray[2]);
+        _cubeyTransform.position = _cubeyPosV3;
+        _cubeyTransform.rotation = Quaternion.Euler(0f, _receivedPlayerFloatArray[3], 0f);*/
 
-        _dataString = DataIdentifier + _localSteamID +
-                      _localPlayerPositionVector.x.ToString("+0000.00;-0000.00") +
-                      _localPlayerPositionVector.y.ToString("+0000.00;-0000.00") +
-                      _localPlayerPositionVector.z.ToString("+0000.00;-0000.00") +
-                      _localPlayerRotationVectorY.ToString("000.0");
+        _steamManager.SendMessageToSocketServer(_finalDataArray);
+    }
 
-        var dataArray = Encoding.UTF8.GetBytes(_dataString);
-        _steamManager.SendMessageToSocketServer(dataArray);
+    private void CreateByteFromFloat()
+    {
+        var floatArray = new[] {_localPosV3.x, _localPosV3.y, _localPosV3.z};
+
+        // create a byte array and copy the floats into it
+        var byteArray = new byte[floatArray.Length * 4];
+        Buffer.BlockCopy(floatArray, 0, byteArray, 0, byteArray.Length);
+
+        // create a new float array and copy the byte array into it
+        var newFloatArray = new float[byteArray.Length / 4];
+        Buffer.BlockCopy(byteArray, 0, newFloatArray, 0, byteArray.Length);
     }
 
     public void ReceiveNetworkedCharacterData(byte[] dataArray)
     {
-        // Change a character position based on ID.
-        _receivedSteamID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 3, 17));
-        
-        _receivedPlayerPositionVector.x = float.Parse(Encoding.UTF8.GetString(dataArray, 20, 8));
-        _receivedPlayerPositionVector.y = float.Parse(Encoding.UTF8.GetString(dataArray, 28, 8));
-        _receivedPlayerPositionVector.z = float.Parse(Encoding.UTF8.GetString(dataArray, 36, 8));
-        _receivedPlayerRotationVectorY = float.Parse(Encoding.UTF8.GetString(dataArray, 44, 5));
-
-        var characterTransform = _clientDataManager.players[_receivedSteamID].character.transform;
-        characterTransform.position = _receivedPlayerPositionVector;
-        characterTransform.rotation = Quaternion.Euler(0f, _receivedPlayerRotationVectorY, 0f);
+        _receivedSteamId = BitConverter.ToUInt64(dataArray, 3);
+        Buffer.BlockCopy(dataArray, 11, _receivedPlayerFloatArray, 0, 16);
+        _receivedPlayerTransform = _clientDataManager.players[_receivedSteamId].character.transform;
+        _receivedPosV3 = new Vector3(_receivedPlayerFloatArray[0], _receivedPlayerFloatArray[1], _receivedPlayerFloatArray[2]);
+        _receivedPlayerTransform.position = _receivedPosV3;
+        _receivedPlayerTransform.rotation = Quaternion.Euler(0f, _receivedPlayerFloatArray[3], 0f);
     }
 }

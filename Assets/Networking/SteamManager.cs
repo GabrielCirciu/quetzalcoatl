@@ -93,36 +93,37 @@ public class SteamManager : MonoBehaviour {
         }
     }
 
-    public void RelaySocketMessageReceived(IntPtr dataPtr, int size, uint connectionID)
+    public void RelaySocketMessageReceived(IntPtr dataIntPtr, int dataSize, uint connectionID)
     {
         // Check first byte, if ASCII: S - Save data
-        _dataTypeCheck[0] = System.Runtime.InteropServices.Marshal.ReadByte(dataPtr);
-        if (_dataTypeCheck[0] == 83) _serverDataManager.ProcessReceivedSaveData(dataPtr, size, connectionID);
+        _dataTypeCheck[0] = System.Runtime.InteropServices.Marshal.ReadByte(dataIntPtr);
+        if (_dataTypeCheck[0] == 83) _serverDataManager.ProcessReceivedSaveData(dataIntPtr, dataSize, connectionID);
         
         try 
         {
             for (var i = 0; i < _steamSocketManager.Connected.Count; i++)
             {
                 if (_steamSocketManager.Connected[i].Id == connectionID) continue;
-                var success = _steamSocketManager.Connected[i].SendMessage(dataPtr, size);
+                var success = _steamSocketManager.Connected[i].SendMessage(dataIntPtr, dataSize);
                 if (success != Result.OK) Debug.LogError("SERVER: Socket Message sending result not OK", this);
+                else System.Runtime.InteropServices.Marshal.FreeHGlobal(dataIntPtr);
             }
         }
         catch (Exception e) { Debug.LogError($"SERVER: Error relaying data! Exception: {e}", this); }
     }
 
-    public bool SendMessageToSocketServer(byte[] messageToSend)
+    public bool SendMessageToSocketServer(byte[] dataArray)
     {
         try
         {
-            var sizeOfMessage = messageToSend.Length;
-            var intPtrMessage = System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeOfMessage);
-            System.Runtime.InteropServices.Marshal.Copy(messageToSend, 0, intPtrMessage, sizeOfMessage);
-            var success = _steamConnectionManager.Connection.SendMessage(intPtrMessage, sizeOfMessage);
+            var dataSize = dataArray.Length;
+            var dataIntPtr = System.Runtime.InteropServices.Marshal.AllocHGlobal(dataSize);
+            System.Runtime.InteropServices.Marshal.Copy(dataArray, 0, dataIntPtr, dataSize);
+            var success = _steamConnectionManager.Connection.SendMessage(dataIntPtr, dataSize);
             if (success == Result.OK)
             {
                 // Free up memory at pointer
-                System.Runtime.InteropServices.Marshal.FreeHGlobal(intPtrMessage);
+                System.Runtime.InteropServices.Marshal.FreeHGlobal(dataIntPtr);
                 return true;
             }
             Debug.LogError($"CLIENT: Result returned unsuccessful");
@@ -134,12 +135,12 @@ public class SteamManager : MonoBehaviour {
         }
     }
     
-    public void ProcessMessageFromSocketServer(IntPtr messageIntPtr, int dataBlockSize)
+    public void ProcessMessageFromSocketServer(IntPtr dataIntPtr, int dataSize)
     {
         try
         {
-            var dataArray = new byte[dataBlockSize];
-            System.Runtime.InteropServices.Marshal.Copy(messageIntPtr, dataArray, 0, dataBlockSize);
+            var dataArray = new byte[dataSize];
+            System.Runtime.InteropServices.Marshal.Copy(dataIntPtr, dataArray, 0, dataSize);
             _clientDataManager.ProcessRecievedData(dataArray);
         }
         catch (Exception e) { Debug.LogError($"CLIENT: Error processing data! Exception: {e}"); }
@@ -160,8 +161,8 @@ public class SteamManager : MonoBehaviour {
             {
                 var success = _steamSocketManager.Connected[i].SendMessage(messaegIntPtr, messageSize);
                 if (success != Result.OK) Debug.LogError("SERVER: Socket Message sending result not OK", this);
-                else System.Runtime.InteropServices.Marshal.FreeHGlobal(messaegIntPtr);
             }
+            System.Runtime.InteropServices.Marshal.FreeHGlobal(messaegIntPtr);
         }
         catch (Exception e) { Debug.LogError($"SERVER: Error sending data! Exception: {e}", this); }
 
@@ -182,8 +183,8 @@ public class SteamManager : MonoBehaviour {
                 if (_steamSocketManager.Connected[i].Id != connectionID) continue;
                 var success = _steamSocketManager.Connected[i].SendMessage(messaegIntPtr, messageSize);
                 if (success != Result.OK) Debug.LogError("SERVER: Socket Message sending result not OK", this);
-                else System.Runtime.InteropServices.Marshal.FreeHGlobal(messaegIntPtr);
             }
+            System.Runtime.InteropServices.Marshal.FreeHGlobal(messaegIntPtr);
         }
         catch (Exception e) { Debug.LogError($"SERVER: Error sending data! Exception: {e}", this); }
     }

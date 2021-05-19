@@ -6,16 +6,17 @@ using UnityEngine;
 public class CharacterNetworkedStats : MonoBehaviour
 {
     // ASCII: N - No save, P - Player, P - Position (send ID, position, rotation, etc.)
-    private const string DataIdentifier = "NPP";
+    private const string PositionDataIdentifier = "NPP";
     
     public static CharacterNetworkedStats instance;
     private SteamManager _steamManager;
     private ClientDataManager _clientDataManager;
+    
     private ulong _receivedSteamId;
     private Transform _localPlayerTransform, _receivedPlayerTransform;
     private Vector3 _localPosV3, _receivedPosV3;
     private float _localRotEulerY, _receivedRotEulerY;
-    private byte[] _dataIdArray, _localSteamIdArray, _receivedSteamIdArray, _finalDataArray;
+    private byte[] _positionDataIdArray, _localSteamIdArray, _receivedSteamIdArray, _finalDataArray;
     private float[] _localPlayerFloatArray, _receivedPlayerFloatArray;
     
     /* --- FOR TESTING PURPOSES ---
@@ -32,7 +33,7 @@ public class CharacterNetworkedStats : MonoBehaviour
         _clientDataManager = ClientDataManager.instance;
         _localPlayerTransform = GetComponent<Transform>();
         
-        _dataIdArray = Encoding.UTF8.GetBytes(DataIdentifier);
+        _positionDataIdArray = Encoding.UTF8.GetBytes(PositionDataIdentifier);
         _localSteamIdArray = BitConverter.GetBytes(SteamClient.SteamId.Value);
 
         /* --- FOR TESTING PURPOSES ---
@@ -50,7 +51,7 @@ public class CharacterNetworkedStats : MonoBehaviour
         _localPlayerFloatArray = new[] {_localPosV3.x, _localPosV3.y, _localPosV3.z, _localRotEulerY};
         
         _finalDataArray = new byte[3 + 8 + 16];
-        Buffer.BlockCopy(_dataIdArray, 0, _finalDataArray, 0, 3);
+        Buffer.BlockCopy(_positionDataIdArray, 0, _finalDataArray, 0, 3);
         Buffer.BlockCopy(_localSteamIdArray, 0, _finalDataArray, 3, 8);
         Buffer.BlockCopy(_localPlayerFloatArray, 0, _finalDataArray, 11, 16);
         

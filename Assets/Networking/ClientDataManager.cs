@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Steamworks;
@@ -5,6 +6,9 @@ using System.Text;
 
 public class ClientDataManager : MonoBehaviour
 {
+    // ASCII: S - Save, P - Player, J - Join
+    private const string JoinDataIdentifier = "SPJ";
+    
     public static ClientDataManager instance;
     private ChatManager _chatManager;
     private SteamManager _steamManager;
@@ -12,6 +16,9 @@ public class ClientDataManager : MonoBehaviour
     private CharacterNetworkedStats _characterNetworkedStats;
 
     [SerializeField] private GameObject characterObj, characterSpawner;
+
+    private string _localPlayerName;
+    private byte[] _joinDataIdArray, _localSteamIdArray, _nameArray, _finalDataArray;
     
     public readonly Dictionary<ulong, Player> players = new Dictionary<ulong, Player>();
     public class Player
@@ -29,68 +36,60 @@ public class ClientDataManager : MonoBehaviour
         _chatManager = ChatManager.instance;
         _playerListManager = PlayerListManager.instance;
         _characterNetworkedStats = CharacterNetworkedStats.instance;
+        
+        _localPlayerName = SteamClient.Name;
+        _joinDataIdArray = Encoding.UTF8.GetBytes(JoinDataIdentifier);
+        _localSteamIdArray = BitConverter.GetBytes(SteamClient.SteamId.Value);
+        _nameArray = Encoding.UTF8.GetBytes(_localPlayerName);
+
         _steamManager.EnableClientDataManager();
         OnJoinedServer();
     }
     
     private void OnJoinedServer()
     {
-        // ASCII: S - Save, P - Player, J - Join
-        // Accound ID is a Steam 64 ID, which is 17 digits long
-        const string messageIdentifier = "SPJ";
-        var accountID = SteamClient.SteamId.Value;
-        var accountName = SteamClient.Name;
-        var messageString = messageIdentifier + accountID + accountName;
-        var messageToByte = Encoding.UTF8.GetBytes(messageString);
-        _steamManager.SendMessageToSocketServer(messageToByte);
-        _chatManager.ReceiveJoinOrLeaveMessage(accountName, " has joined the world!");
+        _finalDataArray = new byte[3 + 8 + _nameArray.Length];
+        Buffer.BlockCopy(_joinDataIdArray, 0, _finalDataArray, 0, 3);
+        Buffer.BlockCopy(_localSteamIdArray, 0, _finalDataArray, 3, 8);
+        Buffer.BlockCopy(_nameArray, 0, _finalDataArray, 11, _nameArray.Length);
+        
+        _steamManager.SendMessageToSocketServer(_finalDataArray);
+        _chatManager.ReceiveJoinOrLeaveMessage(_localPlayerName, " has joined the world!");
     }
 
     public void ProcessRecievedData(byte[] dataArray)
     {
-        // Checks second byte of the data array
-        switch ( dataArray[1] )
+        switch ( dataArray[1] ) // Checks second byte of the data array
         {
-            // ASCII: P - Player
-            case 80:
-                // Checks third byte of the data array
-                switch ( dataArray[2] )
+            case 80: // P - Player
+                switch ( dataArray[2] ) // Checks third byte of the data array
                 {
-                    // ASCII: P - Position/Rotation/Velocity data
-                    case 80:
+                    case 80: // P - Position/Rotation/Velocity data
                         _characterNetworkedStats.ReceiveNetworkedCharacterData(dataArray);
                         break;
-                    // ASCII: J - Joined server
-                    case 74:
-                        AddToPlayerDatabase(dataArray);
+                    case 74: // J - Joined server
+                        //AddToPlayerDatabase(dataArray);
                         break;
-                    // ASCII: L - Left server
-                    case 76:
+                    case 76: // L - Left server
                         RemoveFromPlayerDatabase(dataArray);
                         break;
                 }
                 break;
-
-            // ASCII: C - Chat
-            case 67:
-                // Checks third byte of the data array
-                switch ( dataArray[2] )
+            
+            case 67: // C - Chat
+                switch ( dataArray[2] ) // Checks third byte of the data array
                 {
-                    // ASCII: G - General chat message
-                    case 71:
+                    case 71: // G - General chat message
                         _chatManager.ReceiveChatMessage(dataArray);
                         break;
                 }
                 break;
-
-            // ASCII: N - New player data received on joining server
-            case 78:
-                // Checks third byte of the data array
-                switch ( dataArray[2] )
+            
+            case 78: // N - New player data received on joining server
+                switch ( dataArray[2] ) // Checks third byte of the data array
                 {
-                    // ASCII: P - Player data
-                    case 80:
-                        ProcessAllPlayerData(dataArray);
+                    case 80: // P - Player data
+                        //ProcessAllPlayerData(dataArray);
                         break;
                 }
                 break;

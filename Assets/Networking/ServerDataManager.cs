@@ -3,21 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using static System.Runtime.InteropServices.Marshal;
 
 public class ServerDataManager : MonoBehaviour
 {
-    public static ServerDataManager instance;
-    private SteamSocketManager _steamSocketManager;
+    // ASCII: S - Save, N - New client, P - Player data
+    private const string NewClientDataIdentifier = "SNP";
     private readonly byte[] _dataTypeCheck = new byte[3];
-    public Dictionary<uint, Player> Players = new Dictionary<uint, Player>();
+    
+    public static ServerDataManager instance;
+
+    private ulong _playerID;
+    private string _playerName;
+    private byte[] _newClientDataIdArray, _finalDataArray;
+
+    public readonly Dictionary<uint, Player> players = new Dictionary<uint, Player>();
     public class Player
     {
         public ulong id;
         public string name;
     }
-
-    private ulong _playerID;
-    private string _playerName;
 
     private void Awake()
     {
@@ -28,78 +33,90 @@ public class ServerDataManager : MonoBehaviour
         }
         else if (instance != this) Destroy(gameObject);
     }
-    
+
+    private void Start()
+    {
+        _newClientDataIdArray = Encoding.UTF8.GetBytes(NewClientDataIdentifier);
+    }
+
     public void ClearPlayerDatabase()
     {
         Debug.Log("SERVER: Clearing Player Database (Dictionary)...\n");
-        Players.Clear();
+        players.Clear();
     }
 
-    public void ProcessReceivedSaveData(IntPtr dataPtr, int size, uint connectionID)
+    public void ProcessReceivedSaveData(IntPtr dataPtr, int size, uint connectionId)
     {
         Debug.Log("SERVER: Processing new saveable data...\n");
         
-        // Saves the second and third bytes and then checks them
-        System.Runtime.InteropServices.Marshal.Copy(dataPtr, _dataTypeCheck, 0, 3);
+        // Saves the first three bytes and then checks them starting from second position
+        Copy(dataPtr, _dataTypeCheck, 0, 3);
         switch ( _dataTypeCheck[1] )
         {
-            // ASCII: P - Player related data
-            case 80:
-                // Checks third byte of the data array
-                switch (_dataTypeCheck[2])
+            case 80: // P - Player related data
+                switch (_dataTypeCheck[2]) // Checks third byte of the data array
                 {
-                    // ASCII: J - Joining data
-                    case 74:
-                        AddToPlayerDatabase(dataPtr, size, connectionID);
+                    case 74: // J - Joining data
+                        AddToPlayerDatabase(dataPtr, size, connectionId);
                         break;
-                    // Leaving data is sent directly from socket manager, not handled here
+                    
+                    // Player leaving data is sent directly from socket manager, not handled here
                 }
                 break;
         }
     }
     
-    private void AddToPlayerDatabase(IntPtr dataPtr, int size, uint connectionID)
+    private void AddToPlayerDatabase(IntPtr dataPtr, int size, uint connectionId)
     {
         var dataArray = new byte[size];
-        System.Runtime.InteropServices.Marshal.Copy(dataPtr, dataArray, 0, size);
-        _playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 3, 17));
-        _playerName = Encoding.UTF8.GetString(dataArray, 20, dataArray.Length-20);
+        Copy(dataPtr, dataArray, 0, size);
+        
+        _playerID = BitConverter.ToUInt64(dataArray, 3);
+        _playerName = Encoding.UTF8.GetString(dataArray, 11, dataArray.Length-11);
         var newPlayer = new Player
         {
             id = _playerID,
             name = _playerName
         };
-        
-        Debug.Log($"SERVER: Adding new player [ ID: {_playerID}, Name: {_playerName} ] to the database...\n");
-        Players.Add(connectionID, newPlayer);
+        players.Add(connectionId, newPlayer);
         
         ShowNewPlayerList();
-        SendDataToNewPlayer(connectionID);
+        SendSavedDataToNewPlayer(connectionId);
+        
+        Debug.Log($"SERVER: Adding new player [ ID: {_playerID}, Name: {_playerName} ] to the database...\n");
     }
 
     public void ShowNewPlayerList()
     {
-        var playerListString = Players.Aggregate("SERVER: New Player list:\n",
+        var playerListString = players.Aggregate("SERVER: New Player list:\n",
             (current, player) =>
-                current + "ID: " + Players[player.Key].id + ", Name: " + Players[player.Key].name + "\n");
+                current + "ID: " + players[player.Key].id + ", Name: " + players[player.Key].name + "\n");
         Debug.Log(playerListString);
     }
 
-    private void SendDataToNewPlayer(uint connectionID)
+    private void SendSavedDataToNewPlayer(uint connectionId)
     {
         // Grab all player data, pack it up, and send it as 1 package to the new connection
+        var playerNamesLength = players.Sum(player => players[player.Key].name.Length);
+        _finalDataArray = new byte[3 + 1 + 8 * players.Count + playerNamesLength];
+        Buffer.BlockCopy(_newClientDataIdArray, 0, _finalDataArray, 0, 3);
         
-        // ASCII: S - Save, N - New client, P - Player data
-        var dataString = "SNP" + (char)Players.Count;
-        foreach (var player in Players)
+        var arrayOffset = 3;
+        _finalDataArray[arrayOffset] = Convert.ToByte(players.Count);
+        arrayOffset++;
+        foreach (var player in players)
         {
-            var playerNameLength = (char)Players[player.Key].name.Length;
-            var playerName = Players[player.Key].name;
-            var playerID = Players[player.Key].id;
-            dataString += playerNameLength + playerName + playerID;
+            var steamIdArray = BitConverter.GetBytes(players[player.Key].id);
+            Buffer.BlockCopy(steamIdArray, 0, _finalDataArray, arrayOffset, 8);
+            arrayOffset += 8;
+            _finalDataArray[arrayOffset] = Convert.ToByte(players[player.Key].name.Length);
+            arrayOffset++;
+            var nameArray = Encoding.UTF8.GetBytes(players[player.Key].name);
+            Buffer.BlockCopy(nameArray, 0, _finalDataArray, arrayOffset, players[player.Key].name.Length);
+            arrayOffset += players[player.Key].name.Length;
         }
-        SteamManager.instance.SendDataToNewPlayer(connectionID, dataString);
         
-        Debug.Log($"SERVER: Sending all saved data to {Players[connectionID].name}...\nPlayer data: {dataString}\n");
+        SteamManager.instance.SendDataToNewPlayer(connectionId, _finalDataArray);
+        Debug.Log($"SERVER: Sending all saved data to {players[connectionId].name}...\nPlayer data: {_finalDataArray}\n");
     }
 }

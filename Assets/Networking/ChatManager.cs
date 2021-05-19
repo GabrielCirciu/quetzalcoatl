@@ -10,27 +10,28 @@ using Cinemachine;
 public class ChatManager : MonoBehaviour
 {
     // ASCII: N - No-Save, C - Chat, G - General
-    private const string DataIdentifier = "NCG";
+    private const string ChatDataIdentifier = "NCG";
+    private const int MAXMessages = 10;
     
     public static ChatManager instance;
     private SteamManager _steamManager;
     private ClientDataManager _clientDataManager;
-    private byte[] _dataIdArray, _localSteamIdArray, _finalDataArray;
-    private ulong _receivedSteamId;
+    
     private CinemachineFreeLook _cameraFreeLook;
     private CameraControls _cameraControls;
     private CharacterLocomotion _characterLocomotion;
-    public TMP_InputField chatInputField;
-    public GameObject cinemachineCamera, chatCanvas, characterObj,
-        scrollViewObj, contentPanel, chatInputFieldObject, textObject;
     private CanvasGroup _canvasGroup;
-    private const int MAXMessages = 10;
+
+    [SerializeField] private GameObject cinemachineCamera, chatCanvas, characterObj,
+        scrollViewObj, contentPanel, chatInputFieldObject, textObject;
+    [SerializeField] private TMP_InputField chatInputField;
     public bool isChatWindowOpen;
+    
+    private byte[] _chatDataIdArray, _localSteamIdArray, _finalDataArray;
+    private ulong _receivedSteamId;
+
     private readonly List<Message> _messageList = new List<Message>();
-    private class Message
-    {
-        public TMP_Text text;
-    }
+    private class Message { public TMP_Text text; }
 
     private void Awake() => instance = this;
 
@@ -39,7 +40,7 @@ public class ChatManager : MonoBehaviour
         _steamManager = SteamManager.instance;
         _clientDataManager = ClientDataManager.instance;
         _localSteamIdArray = BitConverter.GetBytes(SteamClient.SteamId.Value);
-        _dataIdArray = Encoding.UTF8.GetBytes(DataIdentifier);
+        _chatDataIdArray = Encoding.UTF8.GetBytes(ChatDataIdentifier);
         
         _cameraFreeLook = cinemachineCamera.GetComponent<CinemachineFreeLook>();
         _canvasGroup = scrollViewObj.GetComponent<CanvasGroup>();
@@ -124,7 +125,7 @@ public class ChatManager : MonoBehaviour
     {
         var textArray = Encoding.UTF8.GetBytes(chatText);
         _finalDataArray = new byte[3 + 8 + textArray.Length];
-        Buffer.BlockCopy(_dataIdArray, 0, _finalDataArray, 0, 3);
+        Buffer.BlockCopy(_chatDataIdArray, 0, _finalDataArray, 0, 3);
         Buffer.BlockCopy(_localSteamIdArray, 0, _finalDataArray, 3, 8);
         Buffer.BlockCopy(textArray, 0, _finalDataArray, 11, textArray.Length);
         
@@ -139,16 +140,11 @@ public class ChatManager : MonoBehaviour
         var timestamp = DateTime.Now.ToString("HH:mm");
         _receivedSteamId = BitConverter.ToUInt64(dataArray, 3);
         var text = Encoding.UTF8.GetString(dataArray, 11, dataArray.Length-11);
-        
         var newTextObject = Instantiate(textObject, contentPanel.transform);
-        var newMessage = new Message
-        {
-            text = newTextObject.GetComponent<TMP_Text>()
-        };
-        _messageList.Add(newMessage);
-
+        var newMessage = new Message { text = newTextObject.GetComponent<TMP_Text>() };
         newMessage.text.text = "<size=10><color=#FF9600>" + timestamp + "</color></size> <color=#00FFFF>" +
                                _clientDataManager.players[_receivedSteamId].name + "</color>: " + text;
+        _messageList.Add(newMessage);
         
         if ( !chatCanvas.activeSelf ) StartCoroutine( ChatFadeOut() );
     }
@@ -157,13 +153,11 @@ public class ChatManager : MonoBehaviour
     {
         RemoveOldChat();
         
-        var newMessage = new Message();
         var timestamp = DateTime.Now.ToString("HH:mm");
         var newTextObject = Instantiate(textObject, contentPanel.transform);
-        newMessage.text = newTextObject.GetComponent<TMP_Text>();
+        var newMessage = new Message { text = newTextObject.GetComponent<TMP_Text>() };
         newMessage.text.text = "<size=10><color=#FF9600>" + timestamp + "</color></size> <color=#FFFF00>" +
                                playerName + text + "</color>";
-        
         _messageList.Add(newMessage);
 
         if ( !chatCanvas.activeSelf ) StartCoroutine( ChatFadeOut() );

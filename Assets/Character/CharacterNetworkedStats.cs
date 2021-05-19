@@ -17,10 +17,12 @@ public class CharacterNetworkedStats : MonoBehaviour
     private float _localRotEulerY, _receivedRotEulerY;
     private byte[] _dataIdArray, _localSteamIdArray, _receivedSteamIdArray, _finalDataArray;
     private float[] _localPlayerFloatArray, _receivedPlayerFloatArray;
-
-    /*public GameObject cubey;
+    
+    /* --- FOR TESTING PURPOSES ---
+    public GameObject cubey;
     private Transform _cubeyTransform;
-    private Vector3 _cubeyPosV3;*/
+    private Vector3 _cubeyPosV3;
+    */
 
     private void Awake() => instance = this;
 
@@ -33,7 +35,9 @@ public class CharacterNetworkedStats : MonoBehaviour
         _dataIdArray = Encoding.UTF8.GetBytes(DataIdentifier);
         _localSteamIdArray = BitConverter.GetBytes(SteamClient.SteamId.Value);
 
-        //_cubeyTransform = cubey.GetComponent<Transform>();
+        /* --- FOR TESTING PURPOSES ---
+        _cubeyTransform = cubey.GetComponent<Transform>();
+        */
 
         _receivedPlayerFloatArray = new float[4];
         InvokeRepeating(nameof(SendNetworkedCharacterData), 3.0f, 0.1f);
@@ -50,7 +54,7 @@ public class CharacterNetworkedStats : MonoBehaviour
         Buffer.BlockCopy(_localSteamIdArray, 0, _finalDataArray, 3, 8);
         Buffer.BlockCopy(_localPlayerFloatArray, 0, _finalDataArray, 11, 16);
         
-        /* FOR TESTING PURPOSES
+        /* --- FOR TESTING PURPOSES ---
         // Run backwards call as if we were the receiver
         _receivedSteamId = BitConverter.ToUInt64(_finalDataArray, 3);
         Buffer.BlockCopy(_finalDataArray, 11, _receivedPlayerFloatArray, 0, 16);
@@ -58,23 +62,11 @@ public class CharacterNetworkedStats : MonoBehaviour
         // Move Cubey
         _cubeyPosV3 = new Vector3(_receivedPlayerFloatArray[0], 3, _receivedPlayerFloatArray[2]);
         _cubeyTransform.position = _cubeyPosV3;
-        _cubeyTransform.rotation = Quaternion.Euler(0f, _receivedPlayerFloatArray[3], 0f);*/
+        _cubeyTransform.rotation = Quaternion.Euler(0f, _receivedPlayerFloatArray[3], 0f);
+        */
 
         _steamManager.SendMessageToSocketServer(_finalDataArray);
     }
-
-    /*private void CreateByteFromFloat()
-    {
-        var floatArray = new[] {_localPosV3.x, _localPosV3.y, _localPosV3.z};
-
-        // create a byte array and copy the floats into it
-        var byteArray = new byte[floatArray.Length * 4];
-        Buffer.BlockCopy(floatArray, 0, byteArray, 0, byteArray.Length);
-
-        // create a new float array and copy the byte array into it
-        var newFloatArray = new float[byteArray.Length / 4];
-        Buffer.BlockCopy(byteArray, 0, newFloatArray, 0, byteArray.Length);
-    }*/
 
     public void ReceiveNetworkedCharacterData(byte[] dataArray)
     {

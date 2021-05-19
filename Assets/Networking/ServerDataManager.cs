@@ -16,6 +16,7 @@ public class ServerDataManager : MonoBehaviour
     private ulong _playerID;
     private string _playerName;
     private byte[] _newClientDataIdArray, _finalDataArray;
+    private int _finalDataArraySize;
 
     public readonly Dictionary<uint, Player> players = new Dictionary<uint, Player>();
     public class Player
@@ -98,10 +99,11 @@ public class ServerDataManager : MonoBehaviour
     {
         // Grab all player data, pack it up, and send it as 1 package to the new connection
         var playerNamesLength = players.Sum(player => players[player.Key].name.Length);
-        _finalDataArray = new byte[3 + 1 + 8 * players.Count + playerNamesLength];
-        Buffer.BlockCopy(_newClientDataIdArray, 0, _finalDataArray, 0, 3);
-        
-        var arrayOffset = 3;
+        _finalDataArraySize = 4 + 9 * players.Count + playerNamesLength;
+        _finalDataArray = new byte[_finalDataArraySize];
+        var arrayOffset = 0;
+        Buffer.BlockCopy(_newClientDataIdArray, 0, _finalDataArray, arrayOffset, 3);
+        arrayOffset += 3;
         _finalDataArray[arrayOffset] = Convert.ToByte(players.Count);
         arrayOffset++;
         foreach (var player in players)
@@ -117,6 +119,6 @@ public class ServerDataManager : MonoBehaviour
         }
         
         SteamManager.instance.SendDataToNewPlayer(connectionId, _finalDataArray);
-        Debug.Log($"SERVER: Sending all saved data to {players[connectionId].name}...\nPlayer data: {_finalDataArray}\n");
+        Debug.Log($"SERVER: Sending all saved data to {players[connectionId].name}...\n");
     }
 }

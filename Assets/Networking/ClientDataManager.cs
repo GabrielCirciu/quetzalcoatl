@@ -68,7 +68,7 @@ public class ClientDataManager : MonoBehaviour
                         _characterNetworkedStats.ReceiveNetworkedCharacterData(dataArray);
                         break;
                     case 74: // J - Joined server
-                        //AddToPlayerDatabase(dataArray);
+                        AddToPlayerDatabase(dataArray);
                         break;
                     case 76: // L - Left server
                         RemoveFromPlayerDatabase(dataArray);
@@ -89,7 +89,7 @@ public class ClientDataManager : MonoBehaviour
                 switch ( dataArray[2] ) // Checks third byte of the data array
                 {
                     case 80: // P - Player data
-                        //ProcessAllPlayerData(dataArray);
+                        ProcessAllPlayerData(dataArray);
                         break;
                 }
                 break;
@@ -98,50 +98,51 @@ public class ClientDataManager : MonoBehaviour
 
     private void ProcessAllPlayerData(byte[] dataArray)
     {
-        var dataString = Encoding.UTF8.GetString(dataArray, 0, dataArray.Length);
-        Debug.Log($"CLIENT: Received server-side player save data array:\n{dataString}\n");
-
-        var playerAmount = dataArray[3];
-        var arrayIndex = 4;
+        Debug.Log($"CLIENT: Received server-side player save data array:\n");
+        var arrayOffset = 3;
+        var playerAmount = dataArray[arrayOffset];
+        arrayOffset++;
         var mySteamID = SteamClient.SteamId;
         
         for (var i = 0; i < playerAmount; i++)
         {
-            var playerNameLength = dataArray[arrayIndex];
-            var playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, arrayIndex+playerNameLength+1, 17));
-            var playerName = Encoding.UTF8.GetString(dataArray, arrayIndex+1, playerNameLength);
+            var playerId = BitConverter.ToUInt64(dataArray, arrayOffset);
+            arrayOffset += 8;
+            var playerNameLength = dataArray[arrayOffset];
+            arrayOffset++;
+            var playerName = Encoding.UTF8.GetString(dataArray, arrayOffset, playerNameLength);
             var newPlayer = new Player
             {
-                id = playerID,
+                id = playerId,
                 name = playerName
             };
-            players.Add(playerID, newPlayer);
-            arrayIndex += playerNameLength + 17 + 1;
-            Debug.Log($"CLIENT: Added new player [ ID: {players[playerID].id}, Name: {players[playerID].name} ] to database...\n");
-            
-            _playerListManager.AddToPlayerList(playerID, playerName);
+            players.Add(playerId, newPlayer);
+            arrayOffset += playerNameLength;
 
-            if (players[playerID].id != mySteamID) SpawnCharacter(playerID);
+            _playerListManager.AddToPlayerList(playerId, playerName);
+            if (players[playerId].id != mySteamID) SpawnCharacter(playerId);
+            Debug.Log($"CLIENT: Added new player [ ID: {players[playerId].id}, Name: {players[playerId].name} ] to database...\n");
         }
     }
     
     private void AddToPlayerDatabase(byte[] dataArray)
     {
-        var playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 3, 17));
-        var playerName = Encoding.UTF8.GetString(dataArray, 20, dataArray.Length-20);
+        var playerId = BitConverter.ToUInt64(dataArray, 3);
+        var playerName = Encoding.UTF8.GetString(dataArray, 11, dataArray.Length-11);
         var newPlayer = new Player
         {
-            id = playerID,
+            id = playerId,
             name = playerName
         };
-        players.Add(playerID, newPlayer);
-        Debug.Log($"CLIENT: Added new player [ ID: {players[playerID].id}, Name: {players[playerID].name} ] to database...\n");
+        players.Add(playerId, newPlayer);
         
-        _playerListManager.AddToPlayerList(playerID, playerName);
+        _playerListManager.AddToPlayerList(playerId, playerName);
         _chatManager.ReceiveJoinOrLeaveMessage(playerName, " has joined the world!");
-        SpawnCharacter(playerID);
+        SpawnCharacter(playerId);
+        Debug.Log($"CLIENT: Added new player [ ID: {players[playerId].id}, Name: {players[playerId].name} ] to database...\n");
     }
 
+    // More things will be handled here, like all customization initialization
     private void SpawnCharacter(ulong playerID)
     {
         players[playerID].character = Instantiate(characterObj, characterSpawner.transform);
@@ -149,12 +150,12 @@ public class ClientDataManager : MonoBehaviour
 
     private void RemoveFromPlayerDatabase(byte[] dataArray)
     {
-        var playerID = ulong.Parse(Encoding.UTF8.GetString(dataArray, 3, 17));
+        var playerID = BitConverter.ToUInt64(dataArray, 3);
         Debug.Log($"CLIENT: Removing [ ID: {players[playerID].id}, Name: {players[playerID].name} ] from the database...\n");
         
         _chatManager.ReceiveJoinOrLeaveMessage(players[playerID].name, " has left the world!");
         Destroy(players[playerID].character);
-        players.Remove(playerID);
         _playerListManager.RemoveFromPlayerList(playerID);
+        players.Remove(playerID);
     }
 }

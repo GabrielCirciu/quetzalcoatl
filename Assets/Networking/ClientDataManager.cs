@@ -7,7 +7,7 @@ using System.Text;
 public class ClientDataManager : MonoBehaviour
 {
     // ASCII: S - Save, P - Player, J - Join
-    private const string JoinDataIdentifier = "SPJ";
+    private const string JoinDataId = "SPJ";
     
     public static ClientDataManager instance;
     private ChatManager _chatManager;
@@ -19,7 +19,7 @@ public class ClientDataManager : MonoBehaviour
 
     private string _localPlayerName;
     private byte[] _joinDataIdArray, _localSteamIdArray, _nameArray, _finalDataArray;
-    
+
     public readonly Dictionary<ulong, Player> players = new Dictionary<ulong, Player>();
     public class Player
     {
@@ -38,10 +38,10 @@ public class ClientDataManager : MonoBehaviour
         _characterNetworkedStats = CharacterNetworkedStats.instance;
         
         _localPlayerName = SteamClient.Name;
-        _joinDataIdArray = Encoding.UTF8.GetBytes(JoinDataIdentifier);
+        _joinDataIdArray = Encoding.UTF8.GetBytes(JoinDataId);
         _localSteamIdArray = BitConverter.GetBytes(SteamClient.SteamId.Value);
         _nameArray = Encoding.UTF8.GetBytes(_localPlayerName);
-
+        
         _steamManager.EnableClientDataManager();
         OnJoinedServer();
     }
@@ -64,7 +64,7 @@ public class ClientDataManager : MonoBehaviour
             case 80: // P - Player
                 switch ( dataArray[2] ) // Checks third byte of the data array
                 {
-                    case 80: // P - Position/Rotation/Velocity data
+                    case 84: // T - Transform
                         _characterNetworkedStats.ReceiveNetworkedCharacterData(dataArray);
                         break;
                     case 74: // J - Joined server

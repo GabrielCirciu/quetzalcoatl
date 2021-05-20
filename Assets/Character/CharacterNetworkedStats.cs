@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class CharacterNetworkedStats : MonoBehaviour
 {
-    // ASCII: N - No save, P - Player, P - Position (send ID, position, rotation, etc.)
-    private const string PositionDataIdentifier = "NPP";
+    // ASCII: N - No save, P - Player, T - Transform (send ID, position, rotation, etc.)
+    private const string TransformDataId = "NPT";
     
     public static CharacterNetworkedStats instance;
     private SteamManager _steamManager;
@@ -33,7 +33,7 @@ public class CharacterNetworkedStats : MonoBehaviour
         _clientDataManager = ClientDataManager.instance;
         _localPlayerTransform = GetComponent<Transform>();
         
-        _positionDataIdArray = Encoding.UTF8.GetBytes(PositionDataIdentifier);
+        _positionDataIdArray = Encoding.UTF8.GetBytes(TransformDataId);
         _localSteamIdArray = BitConverter.GetBytes(SteamClient.SteamId.Value);
 
         /* --- FOR TESTING PURPOSES ---

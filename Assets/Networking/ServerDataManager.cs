@@ -8,7 +8,7 @@ using static System.Runtime.InteropServices.Marshal;
 public class ServerDataManager : MonoBehaviour
 {
     // ASCII: S - Save, N - New client, P - Player data
-    private const string NewClientDataIdentifier = "SNP";
+    private const string NewClientPlayerDataId = "SNP";
     private readonly byte[] _dataTypeCheck = new byte[3];
     
     public static ServerDataManager instance;
@@ -37,7 +37,7 @@ public class ServerDataManager : MonoBehaviour
 
     private void Start()
     {
-        _newClientDataIdArray = Encoding.UTF8.GetBytes(NewClientDataIdentifier);
+        _newClientDataIdArray = Encoding.UTF8.GetBytes(NewClientPlayerDataId);
     }
 
     public void ClearPlayerDatabase()

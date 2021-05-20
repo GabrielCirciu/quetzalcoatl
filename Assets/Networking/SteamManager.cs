@@ -7,7 +7,7 @@ using static System.Runtime.InteropServices.Marshal;
 public class SteamManager : MonoBehaviour
 {
     // ASCII: S - Save, P - Player, L - Left server
-    private const string RemovePlayerDataIdentifier = "SNP";
+    private const string RemovePlayerDataId = "SPL";
     
     public static SteamManager instance;
     private ServerDataManager _serverDataManager;
@@ -26,7 +26,7 @@ public class SteamManager : MonoBehaviour
     public bool activeSteamSocketConnection;
     
     private readonly byte[] _dataTypeCheck = new byte[1];
-    private byte[] _newClientDataIdArray;
+    private byte[] _removePlayerDataIdArray;
 
     private void Awake()
     {
@@ -54,7 +54,7 @@ public class SteamManager : MonoBehaviour
     private void Start()
     {
         _serverDataManager = ServerDataManager.instance;
-        _newClientDataIdArray = Encoding.UTF8.GetBytes(RemovePlayerDataIdentifier);
+        _removePlayerDataIdArray = Encoding.UTF8.GetBytes(RemovePlayerDataId);
     }
 
     private void Update()
@@ -161,7 +161,7 @@ public class SteamManager : MonoBehaviour
         try
         {
             var finalDataArray = new byte[11];
-            Buffer.BlockCopy(_newClientDataIdArray, 0, finalDataArray, 0, 3);
+            Buffer.BlockCopy(_removePlayerDataIdArray, 0, finalDataArray, 0, 3);
             var playerIdArray = BitConverter.GetBytes(_serverDataManager.players[connectionID].id);
             Buffer.BlockCopy(playerIdArray, 0, finalDataArray, 3, 8);
             const int finalDataSize = 11;

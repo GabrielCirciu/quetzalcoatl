@@ -10,7 +10,7 @@ using Cinemachine;
 public class ChatManager : MonoBehaviour
 {
     // ASCII: N - No-Save, C - Chat, G - General
-    private const string ChatDataIdentifier = "NCG";
+    private const string GeneralChatDataId = "NCG";
     private const int MAXMessages = 10;
     
     public static ChatManager instance;
@@ -40,7 +40,7 @@ public class ChatManager : MonoBehaviour
         _steamManager = SteamManager.instance;
         _clientDataManager = ClientDataManager.instance;
         _localSteamIdArray = BitConverter.GetBytes(SteamClient.SteamId.Value);
-        _chatDataIdArray = Encoding.UTF8.GetBytes(ChatDataIdentifier);
+        _chatDataIdArray = Encoding.UTF8.GetBytes(GeneralChatDataId);
         
         _cameraFreeLook = cinemachineCamera.GetComponent<CinemachineFreeLook>();
         _canvasGroup = scrollViewObj.GetComponent<CanvasGroup>();

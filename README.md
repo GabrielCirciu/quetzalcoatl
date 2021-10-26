@@ -1,15 +1,15 @@
 # QUETZALCOATL
-A private repo for managing the project files with other memebers of the team, and without the possibility of completely losing them in the future
+A public repo for managing the project files with other memebers of the team
+A multiplayer survival game based on steams' new Socket Servers and based on a Mayan culture in the skies.
 
 # To do:
 
 # Network:
-	Synchronize position and rotation of each player
+	Synchronize lerping between position and rotation to match a tickrate
 
 # UI:
-	Add every menu button, slider, dropdown
-	Set up every aspect to be functional
-	Add in-game menu, with full functionality
+	Add remaining menu buttons, sliders, dropdowns
+	Give more functionaility to said options
 
 # File Management:
 	Update and improve File Manager script to handles all data file saves

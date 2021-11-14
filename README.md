@@ -1,6 +1,15 @@
 # QUETZALCOATL
 A public repo for managing the project files with other memebers of the team
-A multiplayer survival game based on steams' new Socket Servers and based on a Mayan culture in the skies.
+Networking tool based on Steam Socket Servers, using the Unity rendering engine
+
+# Features:
+	Ability to log into a virtualized world
+	Modifiable graphical settings within the main menu
+	Possiblity of either joining or hosting a server relayed through the steam socket network
+	Connection possible only through Steam server based account system
+	Once logged in, while within a server, the ability to interact with other users on the same server
+	Feature-rich chat system
+	Synchronized position and animation data through all the clients
 
 # To do:
 
